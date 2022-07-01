@@ -1,4 +1,4 @@
-name: CI
+name: Build Installer
 
 on:
   workflow_dispatch:
@@ -18,8 +18,8 @@ jobs:
 
     - name: Create OctoPrint venv and Install
       run: |
-        "mkdir $GITHUB_WORKSPACE\OctoPrint"
-        "cd $GITHUB_WORKSPACE\OctoPrint"
+        "mkdir OctoPrint"
+        "cd OctoPrint"
         "python -m venv venv"
         "venv\Scripts\activate.bat"
         "pip install octoprint"

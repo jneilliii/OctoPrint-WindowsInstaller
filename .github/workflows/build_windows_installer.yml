@@ -16,14 +16,15 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Create OctoPrint venv and Install
+    - name: Create venv
+      id: octoprint-venv
+      uses: syphar/restore-virtualenv@v1.2
+      with:
+        custom_virtualenv_dir: OctoPrint\venv
+
+    - name: Install OctoPrint
       run: |
-        "mkdir OctoPrint"
-        "cd OctoPrint"
-        "python -m venv venv"
-        "venv\Scripts\activate.bat"
         "pip install octoprint"
-        "deactivate"
 
     - name: Build Installer
       run: |

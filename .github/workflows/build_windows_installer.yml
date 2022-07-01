@@ -11,6 +11,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Setup Python
+      uses: actions/setup-python@v4.0.0
+
     - name: Create OctoPrint venv and Install
       run: |
         "mkdir C:\OctoPrint"

@@ -28,7 +28,7 @@ DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=Output
 OutputBaseFilename=OctoPrint Setup
-SetupIconFile=logo.ico
+SetupIconFile=OctoPrint-WindowsInstaller\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -44,8 +44,7 @@ end;
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "OctoPrint\venv\Scripts\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OctoPrint\venv\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\OctoPrint\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

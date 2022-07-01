@@ -1,6 +1,7 @@
 name: Build Installer
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -22,10 +23,14 @@ jobs:
       with:
         custom_virtualenv_dir: ~/OctoPrint/venv
 
-    - name: Build Installer
+    - name: Check
       run: |
-        "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
-      shell: cmd
+        "dir ${{ env.VIRTUAL_ENV }}"
+
+    # - name: Build Installer
+      # run: |
+        # "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
+      # shell: cmd
 
     - name: Upload the installer as an artifact
       uses: actions/upload-artifact@v2

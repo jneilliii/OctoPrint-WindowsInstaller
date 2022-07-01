@@ -17,14 +17,6 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Create venv
-      id: octoprint-venv
-      run: |
-        mkdir -p C:/OctoPrint
-        python -m venv C:/OctoPrint/venv
-        C:/OctoPrint/venv/Scripts/pip install octoprint
-        Get-ChildItem -Path C:/OctoPrint -Recurse
-
     - name: Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"

@@ -23,15 +23,28 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName=C:\{#MyAppName}
 DefaultGroupName={#MyAppName}
-DisableProgramGroupPage=yes
-; Remove the following line to run in administrative install mode (install for all users.)
-PrivilegesRequired=lowest
+DisableProgramGroupPage=no
 OutputDir=Output
 OutputBaseFilename=OctoPrint Setup
 SetupIconFile=logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+WizardImageStretch=False
+
+[Run]
+Filename: "{app}\WPy64-31040\scripts\python.bat"; Parameters: "-m venv {app}\venv"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Creating Virtual Environment"
+Filename: "{app}\venv\Scripts\activate.bat"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Activating venv"
+Filename: "{app}\venv\Scripts\pip"; Parameters: "install octoprint"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Installing OctoPrint into venv"
+Filename: "{sys}\sc.exe"; Parameters: "create OctoPrint start= auto binPath= ""{app}\venv\Scripts\octoprint.exe serve"""; WorkingDir: "{sys}"; Flags: runhidden; StatusMsg: "Creating OctoPrint Service"
+Filename: "{sys}\sc.exe"; Parameters: "start OctoPrint"; WorkingDir: "{sys}"; Flags: runhidden postinstall; Description: "Start OctoPrint Service"; StatusMsg: "Start OctoPrint Service"
+
+[UninstallRun]
+Filename: {sys}\sc.exe; Parameters: "stop OctoPrint" ; Flags: runhidden
+Filename: {sys}\sc.exe; Parameters: "delete OctoPrint" ; Flags: runhidden
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\*"
 
 [Code]
 function InitializeSetup: Boolean;
@@ -44,10 +57,10 @@ end;
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "C:\OctoPrint\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "logo.ico"; DestDir: "{app}"
 
 [Icons]
-Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
+Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"; IconFilename: "{app}\logo.ico"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-

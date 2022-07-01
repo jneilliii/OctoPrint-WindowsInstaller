@@ -18,13 +18,12 @@ jobs:
 
     - name: Create OctoPrint venv and Install
       run: |
-        "mkdir OctoPrint"
-        "cd OctoPrint"
+        "mkdir $GITHUB_WORKSPACE\OctoPrint"
+        "cd $GITHUB_WORKSPACE\OctoPrint"
         "python -m venv venv"
         "venv\Scripts\activate.bat"
         "pip install octoprint"
         "deactivate"
-      shell: cmd
 
     - name: Build Installer
       run: |

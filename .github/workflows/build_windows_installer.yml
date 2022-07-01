@@ -19,11 +19,11 @@ jobs:
 
     - name: Create venv
       id: octoprint-venv
-      uses: syphar/restore-virtualenv@v1.2
-
-    - name: Check
       run: |
-        "echo ${{ env.VIRTUAL_ENV }}"
+        mkdir -p C:/OctoPrint
+        python -m venv C:/OctoPrint/venv
+        OctoPrint/venv/Scripts/pip install octoprint
+        Get-ChildItem -Path C:/OctoPrint -Recurse
 
     # - name: Build Installer
       # run: |

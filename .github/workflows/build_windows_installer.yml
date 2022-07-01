@@ -1,8 +1,7 @@
 name: CI
 
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,7 +15,7 @@ jobs:
       run: |
         "mkdir C:\OctoPrint"
         "cd C:\OctoPrint"
-        "py -m venv venv"
+        "python -m venv venv"
         "venv\Scripts\activate.bat"
         "pip install octoprint"
         "deactivate"

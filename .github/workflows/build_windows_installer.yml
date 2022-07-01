@@ -22,10 +22,6 @@ jobs:
       with:
         custom_virtualenv_dir: OctoPrint\venv
 
-    - name: Install OctoPrint
-      run: |
-        "pip install octoprint"
-
     - name: Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"

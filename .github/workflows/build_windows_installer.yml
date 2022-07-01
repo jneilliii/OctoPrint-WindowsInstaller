@@ -27,7 +27,7 @@ jobs:
 
     - name: Build Installer
       run: |
-        "%programfiles(x86)%\Inno Setup 6\iscc.exe" "$GITHUB_WORKSPACE\OctoPrint-WindowsInstaller\OctoPrint Setup.iss"
+        "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
       shell: cmd
 
     - name: Upload the installer as an artifact

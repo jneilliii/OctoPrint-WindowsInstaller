@@ -20,7 +20,7 @@ jobs:
       id: octoprint-venv
       uses: syphar/restore-virtualenv@v1.2
       with:
-        custom_virtualenv_dir: OctoPrint\venv
+        custom_virtualenv_dir: ${{ github.workspace }}\OctoPrint\venv
 
     - name: Build Installer
       run: |

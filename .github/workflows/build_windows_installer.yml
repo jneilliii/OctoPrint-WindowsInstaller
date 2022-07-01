@@ -20,12 +20,10 @@ jobs:
     - name: Create venv
       id: octoprint-venv
       uses: syphar/restore-virtualenv@v1.2
-      with:
-        custom_virtualenv_dir: ~/OctoPrint/venv
 
     - name: Check
       run: |
-        "dir ${{ env.VIRTUAL_ENV }}"
+        "echo ${{ env.VIRTUAL_ENV }}"
 
     # - name: Build Installer
       # run: |

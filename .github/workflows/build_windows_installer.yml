@@ -18,8 +18,8 @@ jobs:
 
     - name: Create OctoPrint venv and Install
       run: |
-        "mkdir C:\OctoPrint"
-        "cd C:\OctoPrint"
+        "mkdir OctoPrint"
+        "cd OctoPrint"
         "python -m venv venv"
         "venv\Scripts\activate.bat"
         "pip install octoprint"

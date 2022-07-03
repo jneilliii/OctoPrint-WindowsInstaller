@@ -31,7 +31,7 @@ jobs:
 
     - name: Rename Installer
       run: |
-        "copy '.\Output\OctoPrint Setup.exe' '.\Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe'"
+        "copy '${{ github.workspace }}\Output\OctoPrint Setup.exe' '${{ github.workspace }}\Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe'"
 
     - uses: dev-drprasad/delete-tag-and-release@v0.2.0
       with:
@@ -48,6 +48,6 @@ jobs:
         body: "OctoPrint Setup created with Inno Setup using WinPython, winsw, and GitHub Actions."
         fail_on_unmatched_files: true
         files: |
-          Output/OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe
+          ${{ github.workspace }}/Output/OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

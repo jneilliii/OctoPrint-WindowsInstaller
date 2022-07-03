@@ -177,8 +177,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: recursesubdirs createallsubdirs ignoreversion
 Source: "OctoPrint.ico"; DestDir: "{app}"
 Source: "OctoPrintService.exe"; DestDir: "{app}"; AfterInstall: rename_service_wrapper
-Source: "OctoPrintService.xml"; DestDir: "{app}"
-Source: "config.yaml"; DestDir: "{app}"; AfterInstall: rename_config
+Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion
+Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: rename_config
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"

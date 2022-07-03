@@ -32,8 +32,8 @@ jobs:
     - name: "🔖 Create release & attach assets"
       uses: softprops/action-gh-release@v1
       with:
-        name: "OctoPrint ${{ steps.octopi_latestrelease.outputs.release }} Setup for Windows"
-        tag_name: "${{ steps.octopi_latestrelease.outputs.release }}"
+        name: "OctoPrint ${{ steps.octoprint_version.outputs.release }} Setup for Windows"
+        tag_name: "${{ steps.octoprint_version.outputs.release }}"
         body: "OctoPrint Setup created with Inno Setup using WinPython, winsw, and GitHub Actions."
         fail_on_unmatched_files: true
         files: |

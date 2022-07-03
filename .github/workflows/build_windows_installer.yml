@@ -19,20 +19,21 @@ jobs:
         repository: OctoPrint/OctoPrint
         excludes: prerelease, draft
 
-    - name: Build Installer
+    - name: 🔨 Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
         copy "Output\OctoPrint Setup.exe" "Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe"
       shell: cmd
 
-    - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+    - name: 🧹 Delete Existing Release and Tag
+      uses: dev-drprasad/delete-tag-and-release@v0.2.0
       with:
         delete_release: true
         tag_name: ${{ steps.octoprint_version.outputs.release }} # tag name to delete
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: "🔖 Create release & attach assets"
+    - name: 🚀 Create Release and Attach Assets
       uses: softprops/action-gh-release@v1
       with:
         name: "OctoPrint ${{ steps.octoprint_version.outputs.release }} Setup for Windows"

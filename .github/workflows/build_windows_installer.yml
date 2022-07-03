@@ -27,11 +27,8 @@ jobs:
     - name: Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
+        copy "Output\OctoPrint Setup.exe" "Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe"
       shell: cmd
-
-    - name: Rename Installer
-      run: |
-        "copy '${{ github.workspace }}\Output\OctoPrint Setup.exe' '${{ github.workspace }}\Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe'"
 
     - uses: dev-drprasad/delete-tag-and-release@v0.2.0
       with:
@@ -49,4 +46,4 @@ jobs:
         fail_on_unmatched_files: true
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
-          Output\OctoPrint Setup.exe
+          Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe

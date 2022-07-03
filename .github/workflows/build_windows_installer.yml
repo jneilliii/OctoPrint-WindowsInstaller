@@ -17,15 +17,26 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: 🔎 Get OctoPrint Version
+      id: octoprint_version
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: OctoPrint/OctoPrint
+        excludes: prerelease, draft
+
     - name: Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
       shell: cmd
 
-    - name: Upload the installer as an artifact
-      uses: actions/upload-artifact@v2
-      if: ${{ github.event_name != 'pull_request' }}
+    - name: "🔖 Create release & attach assets"
+      uses: softprops/action-gh-release@v1
       with:
-        path: "Output/OctoPrint Setup.exe"
-        name: octoprint-setup
-
+        name: "OctoPrint ${{ steps.octopi_latestrelease.outputs.release }} Setup for Windows"
+        tag_name: "${{ steps.octopi_latestrelease.outputs.release }}"
+        body: "OctoPrint Setup created with Inno Setup using WinPython, winsw, and GitHub Actions."
+        fail_on_unmatched_files: true
+        files: |
+          Output/OctoPrint Setup.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

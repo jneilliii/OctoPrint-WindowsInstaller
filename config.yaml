@@ -1,0 +1,3 @@
+server:
+  commands:
+    serverRestartCommand: ####APPDIR####\OctoPrintService.exe restart!

@@ -5,10 +5,11 @@
 #define MyAppVersion "1.8.1"
 #define MyAppPublisher "OctoPrint"
 #define MyAppURL "https://www.octoprint.org/"
-#define MyAppExeName "octoprint.exe"
+#define MyAppExeName "octoprint.exe" 
 
 #define public Dependency_NoExampleSetup
-#include "CodeDependencies.iss"
+#include "CodeDependencies.iss"    
+#define OctoPrintPort "5000"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -26,41 +27,88 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=no
 OutputDir=Output
 OutputBaseFilename=OctoPrint Setup
-SetupIconFile=logo.ico
+SetupIconFile=OctoPrint.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-WizardImageStretch=False
+DisableReadyPage=True
+UninstallDisplayIcon={app}\logo.ico    
+WizardImageFile=WizModernImage-OctoPrint*.bmp
+WizardSmallImageFile=WizModernSmallImage-OctoPrint*.bmp
+DisableWelcomePage=False
 
 [Run]
-Filename: "{app}\WPy64-31040\scripts\python.bat"; Parameters: "-m venv {app}\venv"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Creating Virtual Environment"
-Filename: "{app}\venv\Scripts\activate.bat"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Activating venv"
-Filename: "{app}\venv\Scripts\pip"; Parameters: "install octoprint"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Installing OctoPrint into venv"
-Filename: "{sys}\sc.exe"; Parameters: "create OctoPrint start= auto binPath= ""{app}\venv\Scripts\octoprint.exe serve"""; WorkingDir: "{sys}"; Flags: runhidden; StatusMsg: "Creating OctoPrint Service"
-Filename: "{sys}\sc.exe"; Parameters: "start OctoPrint"; WorkingDir: "{sys}"; Flags: runhidden postinstall; Description: "Start OctoPrint Service"; StatusMsg: "Start OctoPrint Service"
+Filename: "{app}\WPy64-31040\scripts\upgrade_pip.bat"; WorkingDir: "{app}"; Flags: runhidden shellexec waituntilidle; StatusMsg: "Updating PIP"
+Filename: "{app}\WPy64-31040\Scripts\python.bat"; Parameters: "-m pip install octoprint"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Installing Latest OctoPrint into WinPython"; AfterInstall: update_service_config
+Filename: "{app}\OctoPrintService.exe"; Parameters: "install --no-elevate"; WorkingDir: "{sys}"; Flags: runhidden; StatusMsg: "Creating OctoPrint Service"
+Filename: "{app}\OctoPrintService.exe"; Parameters: "start"; WorkingDir: "{sys}"; Flags: postinstall waituntilidle runhidden; Description: "Start OctoPrint Service"; StatusMsg: "Start OctoPrint Service"
+Filename: "http://localhost:5000/"; Flags: shellexec runasoriginaluser postinstall nowait; Description: "Open OctoPrint"
 
 [UninstallRun]
-Filename: {sys}\sc.exe; Parameters: "stop OctoPrint" ; Flags: runhidden
-Filename: {sys}\sc.exe; Parameters: "delete OctoPrint" ; Flags: runhidden
+Filename: "{app}\OctoPrintService.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden
+Filename: "{app}\OctoPrintService.exe"; Parameters: "uninstall --no-elevate"; WorkingDir: "{app}"; Flags: runhidden
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\*"
 
 [Code]
-function InitializeSetup: Boolean;
-begin
+function InitializeSetup: Boolean; 
+begin 
   Dependency_AddVC2013;
-  Result := True;
+  Result := True;          
+end;
+
+var
+  InputQueryWizardPage: TInputQueryWizardPage;
+
+procedure InitializeWizard;
+begin
+  InputQueryWizardPage := CreateInputQueryPage(wpSelectDir, 'OctoPrint Setup', '', 'The port that OctoPrint will listen on for web connections.');
+  InputQueryWizardPage.Add('Port:', False);
+  InputQueryWizardPage.Values[0] := ExpandConstant('{#OctoPrintPort}');
+end;
+
+procedure replace_in_file(Orig: String; Moded: String);
+var
+  UnicodeStr: string;
+  ANSIStr: AnsiString;
+begin
+  if LoadStringFromFile(ExpandConstant(CurrentFilename), ANSIStr) then
+  begin
+    UnicodeStr := String(ANSIStr);
+    if StringChangeEx(UnicodeStr, ExpandConstant(Orig), ExpandConstant(Moded), True) > 0 then
+      SaveStringToFile(ExpandConstant(CurrentFilename), AnsiString(UnicodeStr), False);
+  end;
+end;
+
+procedure update_service_config(); 
+var
+  UnicodeStr: string;
+  ANSIStr: AnsiString;
+begin
+  if LoadStringFromFile(ExpandConstant('{app}\OctoPrintService.xml'), ANSIStr) then
+  begin
+    UnicodeStr := String(ANSIStr);
+    StringChangeEx(UnicodeStr, '####PORT####', InputQueryWizardPage.Values[0], True)
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31040\python-3.10.4.amd64\Scripts\octoprint.exe'), True)
+    SaveStringToFile(ExpandConstant('{app}\OctoPrintService.xml'), AnsiString(UnicodeStr), False);
+  end;
 end;
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: ignoreversion recursesubdirs createallsubdirs
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: "logo.ico"; DestDir: "{app}"
+Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: recursesubdirs createallsubdirs
+Source: "OctoPrint.ico"; DestDir: "{app}"
+Source: "OctoPrintService.exe"; DestDir: "{app}"
+Source: "OctoPrintService.xml"; DestDir: "{app}"; AfterInstall: replace_in_file('####BASEDIR####', '{app}\basedir')
+Source: "config.yaml"; DestDir: "{app}\basedir"; Flags: onlyifdoesntexist; AfterInstall: replace_in_file('####APPDIR####', '{app}')
 
 [Icons]
-Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"; IconFilename: "{app}\logo.ico"
+Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "http://localhost:5000/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
+Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
+Name: "{group}\Service\Start OctoPrint Service"; Filename: "{app}\OctoPrintService.exe"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0; Parameters: "start"
+Name: "{group}\Service\Stop OctoPrint Service"; Filename: "{app}\OctoPrintService.exe"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0; Parameters: "stop"
+Name: "{group}\Service\Restart OctoPrint Service"; Filename: "{app}\OctoPrintService.exe"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0; Parameters: "restart"

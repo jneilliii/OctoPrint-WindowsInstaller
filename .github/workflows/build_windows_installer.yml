@@ -1,4 +1,4 @@
-name: Build Installer
+name: 👷 Build Installer
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout
+    - name: 📝 Checkout
       uses: actions/checkout@v2
 
     - name: 🔎 Get OctoPrint Version

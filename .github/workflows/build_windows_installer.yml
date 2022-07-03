@@ -28,7 +28,11 @@ jobs:
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
       shell: cmd
-    
+
+    - name: Rename Installer
+      run: |
+        "copy "".\Output\OctoPrint Setup.exe"" "".\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe"""
+
     - uses: dev-drprasad/delete-tag-and-release@v0.2.0
       with:
         delete_release: true
@@ -44,6 +48,6 @@ jobs:
         body: "OctoPrint Setup created with Inno Setup using WinPython, winsw, and GitHub Actions."
         fail_on_unmatched_files: true
         files: |
-          Output/OctoPrint Setup.exe
+          "OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

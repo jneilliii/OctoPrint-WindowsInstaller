@@ -27,7 +27,6 @@ jobs:
     - name: Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" "OctoPrint Setup.iss"
-        "copy ""./Output/OctoPrint Setup.exe"" ""./OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe"""
       shell: cmd
     
     - uses: dev-drprasad/delete-tag-and-release@v0.2.0

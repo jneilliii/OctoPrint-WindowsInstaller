@@ -48,6 +48,6 @@ jobs:
         body: "OctoPrint Setup created with Inno Setup using WinPython, winsw, and GitHub Actions."
         fail_on_unmatched_files: true
         files: |
-          "OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe"
+          OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,11 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OctoPrint"
-#define MyAppVersion "1.8.1"
 #define MyAppPublisher "OctoPrint"
 #define MyAppURL "https://www.octoprint.org/"
 #define MyAppExeName "octoprint.exe" 
-
 #define public Dependency_NoExampleSetup
 #include "CodeDependencies.iss"  
 
@@ -25,7 +23,7 @@ DefaultDirName=C:\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=False
 OutputDir=Output
-OutputBaseFilename=OctoPrint Setup
+OutputBaseFilename=OctoPrint Setup {#MyAppVersion}
 SetupIconFile=OctoPrint.ico
 Compression=lzma
 SolidCompression=yes

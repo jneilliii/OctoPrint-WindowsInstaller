@@ -12,11 +12,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Setup Python
-      uses: actions/setup-python@v4.0.0
-      with:
-        python-version: '3.x'
-
     - name: 🔎 Get OctoPrint Version
       id: octoprint_version
       uses: pozetroninc/github-action-get-latest-release@master

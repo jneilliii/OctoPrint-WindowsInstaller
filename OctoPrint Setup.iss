@@ -51,6 +51,9 @@ Filename: "{app}\Service Control\"; WorkingDir: "{app}\Service Control\"; Flags:
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\*"
 
+[Registry]
+Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty
+
 [Code]
 function InitializeSetup: Boolean; 
 begin 
@@ -64,7 +67,21 @@ var
   WrapperPath: String;
   OctoPrintPort: String;
   OctoPrintBasedir: String;
-  InstallWinPython: Boolean;
+
+function GetServiceWrapperPath(Param: string): String;
+begin
+  Result := WrapperPath;
+end;
+
+function GetOctoPrintPort(Param: string): String;
+begin
+  Result := OctoPrintPort;
+end; 
+
+function GetOctoPrintBasedir(Param: string): String;
+begin
+  Result := OctoPrintBasedir;
+end;
 
 procedure InitializeWizard;
 begin
@@ -130,21 +147,6 @@ begin
   end;
 end;
 
-function GetServiceWrapperPath(Param: string): String;
-begin
-  Result := WrapperPath;
-end;
-
-function GetOctoPrintPort(Param: string): String;
-begin
-  Result := OctoPrintPort;
-end; 
-
-function GetOctoPrintBasedir(Param: string): String;
-begin
-  Result := OctoPrintBasedir;
-end;
-
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin   
   if CurPageID = InputQueryWizardPage.ID then 
@@ -165,16 +167,6 @@ begin
   Result := True;
 end;
 
-function WinPythonInstalled(DirName: String): Boolean;
-begin
-  if InstallWinPython then begin
-    Result := True; 
-  end else begin
-    InstallWinPython := DirExists(DirName) = False;
-    Result := False;
-  end;
-end;
-
 procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin
   { Store the settings so we can restore them next time }
@@ -186,7 +178,7 @@ end;
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: recursesubdirs createallsubdirs ignoreversion; Check: WinPythonInstalled(ExpandConstant('{src}'))
+Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: recursesubdirs createallsubdirs ignoreversion
 Source: "OctoPrint.ico"; DestDir: "{app}"
 Source: "OctoPrintService.exe"; DestDir: "{app}"; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"

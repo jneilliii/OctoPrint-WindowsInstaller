@@ -47,7 +47,6 @@ jobs:
         tag_name: "${{ steps.octoprint_version.outputs.release }}"
         body: "OctoPrint Setup created with Inno Setup using WinPython, winsw, and GitHub Actions."
         fail_on_unmatched_files: true
+        token: ${{ secrets.GITHUB_TOKEN }}
         files: |
-          ${{ github.workspace }}/Output/OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ${{ github.workspace }}\Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe

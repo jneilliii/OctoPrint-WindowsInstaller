@@ -183,6 +183,7 @@ Source: "OctoPrintService.xml"; DestDir: "{app}"
 Source: "config.yaml"; DestDir: "{app}"; AfterInstall: rename_config
 
 [Icons]
-Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "http://localhost:5000/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
+;Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "http://localhost:5000/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
 ;Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
+Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0

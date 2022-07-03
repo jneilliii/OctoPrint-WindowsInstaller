@@ -36,10 +36,8 @@ DisableWelcomePage=False
 DisableDirPage=False
 
 [Run]
-Filename: "{app}\WPy64-31040\scripts\upgrade_pip.bat"; WorkingDir: "{app}"; Flags: runhidden shellexec waituntilidle; StatusMsg: "Updating PIP"
-Filename: "{app}\WPy64-31040\Scripts\python.bat"; Parameters: "-m pip install octoprint"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Installing Latest OctoPrint into WinPython"; AfterInstall: update_service_config
-;Filename: "{app}\OctoPrintService{#OctoPrintPort}.exe"; Parameters: "install --no-elevate"; WorkingDir: "{sys}"; Flags: runhidden; StatusMsg: "Creating OctoPrint Service"
-;Filename: "{app}\OctoPrintService{OctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{sys}"; Flags: postinstall waituntilidle runhidden; Description: "Start OctoPrint Service"; StatusMsg: "Start OctoPrint Service"
+;Filename: "{app}\WPy64-31040\scripts\upgrade_pip.bat"; WorkingDir: "{app}"; Flags: runhidden shellexec waituntilidle; StatusMsg: "Updating PIP"
+;Filename: "{app}\WPy64-31040\Scripts\python.bat"; Parameters: "-m pip install octoprint"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Installing Latest OctoPrint into WinPython"; AfterInstall: update_service_config
 Filename: "{app}\Service Control\"; WorkingDir: "{app}\Service Control\"; Flags: shellexec runasoriginaluser postinstall nowait; Description: "Open OctoPrint Service Control Folder to Install and Manage Services"
 
 [UninstallRun]
@@ -47,7 +45,7 @@ Filename: "{app}\Service Control\"; WorkingDir: "{app}\Service Control\"; Flags:
 ;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "uninstall --no-elevate"; WorkingDir: "{app}"; Flags: runhidden
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}\*"
+;Type: filesandordirs; Name: "{app}\*"
 
 [Registry]
 Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty
@@ -183,7 +181,5 @@ Source: "OctoPrintService.xml"; DestDir: "{app}"
 Source: "config.yaml"; DestDir: "{app}"; AfterInstall: rename_config
 
 [Icons]
-;Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "http://localhost:5000/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
-;Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
+Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"

@@ -19,6 +19,12 @@ jobs:
         repository: OctoPrint/OctoPrint
         excludes: prerelease, draft
 
+    - name: 🔨 Install OctoPrint into WinPython
+      run: |
+        WPy64-31040\scripts\upgrade_pip.bat
+        WPy64-31040\Scripts\python.bat -m pip install OctoPrint==${{ steps.octoprint_version.outputs.release }}
+      shell: cmd
+
     - name: 🔨 Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DMyAppVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"

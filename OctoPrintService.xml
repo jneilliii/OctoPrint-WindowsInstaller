@@ -25,9 +25,9 @@
 
 <service>
   <!-- ID of the service. It should be unique across the Windows system-->
-  <id>OctoPrint</id>
+  <id>OctoPrint####PORT####</id>
   <!-- Display name of the service -->
-  <name>OctoPrint</name>
+  <name>OctoPrint on Port ####PORT####</name>
   <!-- Service description -->
   <description>Service wrapper for OctoPrint (powered by WinSW).</description>
   <!-- Path to the executable, which should be started -->

@@ -138,7 +138,7 @@ begin
     OctoPrintPort := InputQueryWizardPage.Values[0];
     WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
   end;
-  if (CurPageID = wpSelectDir) or ((CurPageID = InputQueryWizardPage.ID) and IsComponentSelected('add_instance')) then 
+  if (CurPageID = wpSelectDir) or ((CurPageID = InputQueryWizardPage.ID) and WizardIsComponentSelected('add_instance')) then 
   begin
     DataDirPage.Values[0] := WizardDirValue() + '\basedir\' + OctoPrintPort;
     WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';

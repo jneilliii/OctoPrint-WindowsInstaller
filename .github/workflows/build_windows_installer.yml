@@ -31,14 +31,14 @@ jobs:
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
       shell: cmd
 
-    - name: Generate CA
+    - name: 🔨 Generate CA
       id: write_file
       uses: timheuer/base64-to-file@v1.1
       with:
         fileName: 'OctoPrintCA.crt'
         encodedString: ${{ secrets.OCTOPRINT_CA }}
         
-    - name: Import CA
+    - name: 💉 Import CA
       run: |
         certutil -addstore "Root" "${{ steps.write_file.outputs.filePath }}"
       shell: cmd

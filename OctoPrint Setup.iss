@@ -25,7 +25,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName=C:\{#MyAppName}
 DefaultGroupName={#MyAppName}
-DisableProgramGroupPage=False
+DisableProgramGroupPage=yes
 OutputDir=Output
 OutputBaseFilename=OctoPrint Setup {#MyAppVersion}
 SetupIconFile=OctoPrint.ico
@@ -40,6 +40,7 @@ DisableWelcomePage=False
 DisableDirPage=False
 Uninstallable=InstalledOnce
 FlatComponentsList=False
+AppendDefaultGroupName=False
 
 [Run]
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle; Description: "Install Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
@@ -270,8 +271,6 @@ begin
     SaveStringToFile(ExpandConstant('{app}\OctoPrintService' + OctoPrintPort + '.xml'), AnsiString(UnicodeStr), False);
   end;
 end;
-
-
 
 procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin

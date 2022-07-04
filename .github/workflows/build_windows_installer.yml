@@ -32,19 +32,10 @@ jobs:
       shell: cmd
 
     - name: ✏️ Sign Installer
-      uses: Dana-Prajea/code-sign-action@v4
-      with:
-        certificate: '${{ secrets.CERTIFICATE }}'
-        password: '${{ secrets.PASSWORD }}'
-        certificatesha1: '${{ secrets.CERTHASH }}'
-        certificatename: '${{ secrets.CERTNAME }}'
-        folder: 'Output'
-        recursive: true
-    - name: ✏️ Sign the installer
       uses: dlemstra/code-sign-action@v1
       with:
         certificate: '${{ secrets.CODESIGN }}'
-        folder: 'files'
+        folder: 'Output'
         recursive: true
 
     - name: 🧹 Delete Existing Release and Tag

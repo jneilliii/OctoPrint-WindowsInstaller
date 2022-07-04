@@ -26,11 +26,6 @@ jobs:
         WPy64-31040\Scripts\python.bat -m pip install OctoPrint==${{ steps.octoprint_version.outputs.release }}
       shell: cmd
 
-    - name: 🔨 Build Installer
-      run: |
-        "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
-      shell: cmd
-
     - name: 🔨 Generate CA
       id: write_file
       uses: timheuer/base64-to-file@v1.1
@@ -41,6 +36,22 @@ jobs:
     - name: 💉 Import CA
       run: |
         certutil -addstore "Root" "${{ steps.write_file.outputs.filePath }}"
+      shell: cmd
+
+    - name: ✏️ Sign ServiceWrapper
+      uses: GabrielAcostaEngler/signtool-code-sign@1.0.6
+      with:
+        certificate: '${{ secrets.CERTIFICATE }}'
+        cert-password: '${{ secrets.PASSWORD }}'
+        cert-sha1: '${{ secrets.CERTHASH }}'
+        cert-description: 'OctoPrint Service Wrapper by jneilliii'
+        folder: '.'
+        recursive: false
+        timestamp-server: 'http://timestamp.digicert.com'
+
+    - name: 🔨 Build Installer
+      run: |
+        "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
       shell: cmd
 
     - name: ✏️ Sign Installer

@@ -38,11 +38,11 @@ WizardImageFile=WizModernImage-OctoPrint*.bmp
 WizardSmallImageFile=WizModernSmallImage-OctoPrint*.bmp
 DisableWelcomePage=False
 DisableDirPage=False
+Uninstallable=IsComponentSelected('initial_instance')
 
 [Run]
-;Filename: "{app}\WPy64-31040\scripts\upgrade_pip.bat"; WorkingDir: "{app}"; Flags: runhidden shellexec waituntilidle; StatusMsg: "Updating PIP"
-;Filename: "{app}\WPy64-31040\Scripts\python.bat"; Parameters: "-m pip install octoprint"; WorkingDir: "{app}"; Flags: runhidden; StatusMsg: "Installing Latest OctoPrint into WinPython"; AfterInstall: update_service_config
-Filename: "{app}\Service Control\"; WorkingDir: "{app}\Service Control\"; Flags: shellexec runasoriginaluser postinstall nowait; Description: "Open OctoPrint Service Control Folder to Install and Manage Services"
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle; Description: "Install Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle; Description: "Start Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"
 
 [UninstallRun]
 ;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden
@@ -54,6 +54,13 @@ Filename: "{app}\Service Control\"; WorkingDir: "{app}\Service Control\"; Flags:
 [Registry]
 Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty
 
+[Components]
+Name: "initial_instance"; Description: "First Time Install"; Flags: exclusive
+Name: "add_instance"; Description: "Add New Instance"; Flags: exclusive
+
+[ThirdParty]
+UseRelativePaths=True
+
 [Code]
 function InitializeSetup: Boolean; 
 begin 
@@ -64,6 +71,7 @@ end;
 var
   InputQueryWizardPage: TInputQueryWizardPage;
   DataDirPage: TInputDirWizardPage;
+  ComponentSelectPage: TWizardPage;
   WrapperPath: String;
   OctoPrintPort: String;
   OctoPrintBasedir: String;
@@ -85,8 +93,12 @@ end;
 
 procedure InitializeWizard;
 begin
+// Custom Component Select Page
+  ComponentSelectPage := CreateCustomPage(wpWelcome, 'OctoPrint Setup', 'What type of installation?');
+  WizardForm.ComponentsList.Parent := ComponentSelectPage.Surface;
+
 // OctoPrint Port Dialog Page     
-  InputQueryWizardPage := CreateInputQueryPage(wpWelcome, 'OctoPrint Setup', 'What port should OctoPrint use?', 'Enter the port that OctoPrint will listen on for web connections, then click Next.');
+  InputQueryWizardPage := CreateInputQueryPage(ComponentSelectPage.ID, 'OctoPrint Setup', 'What port should OctoPrint use?', 'Enter the port that OctoPrint will listen on for web connections, then click Next.');
   InputQueryWizardPage.Add('Port:', False);
   InputQueryWizardPage.Values[0] := GetPreviousData('OctoPrintPort', '5000');
   
@@ -101,6 +113,42 @@ begin
 // Initialize contstants
   OctoPrintPort := InputQueryWizardPage.Values[0];  
   WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
+end;
+
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  Result := False;
+
+  if PageID = wpSelectComponents then
+  begin
+    Result := True;
+  end;
+
+  if (PageID = wpSelectDir) and IsComponentSelected('add_instance') then
+  begin
+    Result := True;
+  end;
+end;
+
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin   
+  if CurPageID = InputQueryWizardPage.ID then 
+  begin
+    OctoPrintPort := InputQueryWizardPage.Values[0];
+    WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
+  end;
+  if (CurPageID = wpSelectDir) or ((CurPageID = InputQueryWizardPage.ID) and IsComponentSelected('add_instance')) then 
+  begin
+    DataDirPage.Values[0] := WizardDirValue() + '\basedir\' + OctoPrintPort;
+    WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
+    OctoPrintBasedir := DataDirPage.Values[0];
+  end;
+  if CurPageID = DataDirPage.ID then
+  begin
+    OctoPrintBasedir := DataDirPage.Values[0];
+  end;
+  Result := True;
 end;
 
 procedure rename_config();
@@ -147,24 +195,23 @@ begin
   end;
 end;
 
-function NextButtonClick(CurPageID: Integer): Boolean;
-begin   
-  if CurPageID = InputQueryWizardPage.ID then 
+function GetOctoPrintInstances(): TArrayOfString;
+var
+  Names: TArrayOfString;
+  I: Integer;
+  S: String;
+begin
+  if RegGetValueNames(HKEY_CURRENT_USER, 'Control Panel\Mouse', Names) then
   begin
-    OctoPrintPort := InputQueryWizardPage.Values[0];
-    WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
-  end;
-  if CurPageID = wpSelectDir then 
+    S := '';
+    for I := 0 to GetArrayLength(Names)-1 do
+      S := S + Names[I] + #13#10;
+    MsgBox('List of values:'#13#10#13#10 + S, mbInformation, MB_OK);
+  end else
   begin
-    DataDirPage.Values[0] := WizardDirValue() + '\basedir\' + OctoPrintPort;
-    WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
-    OctoPrintBasedir := DataDirPage.Values[0];
+    // add any code to handle failure here
   end;
-  if CurPageID = DataDirPage.ID then
-  begin
-    OctoPrintBasedir := DataDirPage.Values[0];
-  end;
-  Result := True;
+  Result := Names
 end;
 
 procedure RegisterPreviousData(PreviousDataKey: Integer);
@@ -178,11 +225,11 @@ end;
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: recursesubdirs createallsubdirs ignoreversion
-Source: "OctoPrint.ico"; DestDir: "{app}"
-Source: "OctoPrintService.exe"; DestDir: "{app}"; AfterInstall: rename_service_wrapper
-Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: update_service_config
-Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: rename_config
+Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: recursesubdirs createallsubdirs ignoreversion onlyifdoesntexist; Components: initial_instance
+Source: "OctoPrint.ico"; DestDir: "{app}"; Components: initial_instance
+Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
+Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config
+Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"

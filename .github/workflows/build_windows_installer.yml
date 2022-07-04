@@ -31,6 +31,16 @@ jobs:
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
       shell: cmd
 
+    - name: Sign Executable
+      uses: DanaBear/code-sign-action@v4
+      with:
+        certificate: '${{ secrets.CERTIFICATE }}'
+        password: '${{ secrets.PASSWORD }}'
+        certificatesha1: '${{ secrets.CERTHASH }}'
+        certificatename: '${{ secrets.CERTNAME }}'
+        folder: 'Output'
+        recursive: true
+
     - name: 🧹 Delete Existing Release and Tag
       uses: dev-drprasad/delete-tag-and-release@v0.2.0
       with:

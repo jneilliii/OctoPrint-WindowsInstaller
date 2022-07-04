@@ -3,6 +3,8 @@ name: 👷 Build Installer
 on:
   push:
   workflow_dispatch:
+  repository_dispatch:
+    types: [octoprint_release]
 
 jobs:
   build:
@@ -26,7 +28,7 @@ jobs:
 
     - name: 🔨 Build Installer
       run: |
-        "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DMyAppVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
+        "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
       shell: cmd
 
     - name: 🧹 Delete Existing Release and Tag

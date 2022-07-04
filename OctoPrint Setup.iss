@@ -2,6 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OctoPrint"
+#ifndef OctoPrintVersion
+  #define OctoPrintVersion "unknown"
+#endif
+#define MyAppVersion OctoPrintVersion
 #define MyAppPublisher "OctoPrint"
 #define MyAppURL "https://www.octoprint.org/"
 #define MyAppExeName "octoprint.exe" 
@@ -177,7 +181,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Source: "WPy64-31040\*"; DestDir: "{app}\WPy64-31040"; Flags: recursesubdirs createallsubdirs ignoreversion
 Source: "OctoPrint.ico"; DestDir: "{app}"
 Source: "OctoPrintService.exe"; DestDir: "{app}"; AfterInstall: rename_service_wrapper
-Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion
+Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: update_service_config
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: rename_config
 
 [Icons]

@@ -1,0 +1,41 @@
+name: "Dispatch"
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "Check Versions"
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: ⬇ Checkout
+      uses: actions/checkout@v2
+
+    - id: my_latestrelease
+      name: 🔎 Get My Version
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: ${{ github.repository }}
+
+    - id: octoprint_latestrelease
+      name: 🔎 Get OctoPrint Version
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: OctoPrint/OctoPrint
+        excludes: prerelease, draft
+
+    - name: 💁 Print Versions
+      run: |
+        echo "my version: ${{ steps.my_latestrelease.outputs.release }}"
+        echo "OctoPrint version: ${{ steps.octoprint_latestrelease.outputs.release }}"
+
+    - name: 🚀 Repository Dispatch
+      if: ${{ format('{0}', steps.octoprint_latestrelease.outputs.release) != steps.my_latestrelease.outputs.release }}
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPODISPATCH_TOKEN }}
+        repository: jneilliii/OctoPrint-WindowsInstaller
+        event-type: octoprint_release

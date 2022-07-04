@@ -38,7 +38,8 @@ WizardImageFile=WizModernImage-OctoPrint*.bmp
 WizardSmallImageFile=WizModernSmallImage-OctoPrint*.bmp
 DisableWelcomePage=False
 DisableDirPage=False
-Uninstallable=WizardIsComponentSelected('initial_instance')
+Uninstallable=InstalledOnce
+FlatComponentsList=False
 
 [Run]
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle; Description: "Install Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
@@ -55,8 +56,8 @@ Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "star
 Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty
 
 [Components]
-Name: "initial_instance"; Description: "First Time Install"; Flags: exclusive
-Name: "add_instance"; Description: "Add New Instance"; Flags: exclusive
+Name: "initial_instance"; Description: "Initial Install"; Flags: exclusive; Check: not InstalledOnce
+Name: "add_instance"; Description: "Adding New Instance"; Flags: exclusive; Check: InstalledOnce
 
 [ThirdParty]
 UseRelativePaths=True
@@ -91,16 +92,89 @@ begin
   Result := OctoPrintBasedir;
 end;
 
+function GetOctoPrintInstances(): TArrayOfString;
+var
+  Names: TArrayOfString;
+  I: Integer;
+  S: String;
+begin
+  if RegGetValueNames(HKLM, 'Software\OctoPrint\Instances', Names) then
+  begin
+    // any additional processing?
+  end else
+  begin
+    // add any code to handle failure here
+  end;
+  Result := Names
+end;
+
+function GetOctoPrintInstancesAsString(OctoPrintInstances: TArrayOfString): string;
+var
+  I: integer;
+  S: string;
+begin
+  S := '';
+  for I := 0 to GetArrayLength(OctoPrintInstances)-1 do
+    S := S + OctoPrintInstances[I] + #13#10;
+  Result := S;
+end;
+
+function InstanceExists(OctoPrintInstances: TArrayOfString; sInstance: string): boolean;
+var
+  I: integer;
+  bResult: boolean;
+begin
+  bResult := False;
+  for I := 0 to GetArrayLength(OctoPrintInstances)-1 do
+    if OctoPrintInstances[I] = sInstance then
+      bResult := True;
+  Result := bResult;
+end;
+
+function InstalledOnce: Boolean;
+begin
+  Result := RegKeyExists(HKLM, 'Software\OctoPrint\Instances');
+end;
+
+procedure btnListInstancesOnClick(Sender: TObject);
+begin
+  GetOctoPrintInstances();
+end;
+
 procedure InitializeWizard;
+var
+  sComponetSelectMessage: string;
+  sInputQueryMessage: string;  
+  btnListInstances: TButton; 
 begin
 // Custom Component Select Page
-  ComponentSelectPage := CreateCustomPage(wpWelcome, 'OctoPrint Setup', 'What type of installation?');
-  WizardForm.ComponentsList.Parent := ComponentSelectPage.Surface;
+  if InstalledOnce then 
+  begin
+    sComponetSelectMessage := 'You are installing a new instance of OctoPrint, click Next.';
+    sInputQueryMessage := 'You are installing a new instance of OctoPrint. Enter a port number that has not been previouslly used, and then click Next.' + #13#10#13#10'Currently Used Ports:'#13#10 + GetOctoPrintInstancesAsString(GetOctoPrintInstances);
+  end else 
+  begin      
+    sComponetSelectMessage := 'You are installing OctoPrint for the first time, click Next.';
+    sInputQueryMessage := 'You are installing OctoPrint for the first time, click Next.';
+  end;
+    
+//  ComponentSelectPage := CreateInputQueryPage(wpWelcome, 'OctoPrint Setup', 'What type of installation is being performed?', sComponetSelectMessage);
+//  WizardForm.ComponentsList.Parent := ComponentSelectPage.Surface;
 
 // OctoPrint Port Dialog Page     
-  InputQueryWizardPage := CreateInputQueryPage(ComponentSelectPage.ID, 'OctoPrint Setup', 'What port should OctoPrint use?', 'Enter the port that OctoPrint will listen on for web connections, then click Next.');
+  InputQueryWizardPage := CreateInputQueryPage(wpWelcome, 'OctoPrint Setup', 'Which port to use for this instance?', sInputQueryMessage);
   InputQueryWizardPage.Add('Port:', False);
-  InputQueryWizardPage.Values[0] := GetPreviousData('OctoPrintPort', '5000');
+  InputQueryWizardPage.Values[0] := GetPreviousData('OctoPrintPort', '');
+  
+//  if InstalledOnce then begin
+//    btnListInstances := TNewButton.Create(InputQueryWizardPage);
+//    btnListInstances.Parent := InputQueryWizardPage.Surface;
+//    btnListInstances.Caption := 'List Instances';
+//    btnListInstances.Top := 100;
+//    btnListInstances.Left := 10;
+//    btnListInstances.Height := WizardForm.CancelButton.Height;
+//    btnListInstances.OnClick := @btnListInstancesOnClick;
+//  end;
   
 // OctoPrint Basedir Selection Page  
   DataDirPage := CreateInputDirPage(wpSelectDir,
@@ -124,21 +198,28 @@ begin
     Result := True;
   end;
 
-  if (PageID = wpSelectDir) and WizardIsComponentSelected('add_instance') then
+  if (PageID = wpSelectDir) and InstalledOnce then
   begin
     Result := True;
-  end;
+  end;   
 end;
 
 
 function NextButtonClick(CurPageID: Integer): Boolean;
-begin   
+var
+  bResult: boolean;
+begin
+  bResult := True;   
   if CurPageID = InputQueryWizardPage.ID then 
   begin
+    if (InputQueryWizardPage.Values[0] = '') or InstanceExists(GetOctoPrintInstances, InputQueryWizardPage.Values[0]) then
+    begin
+      bResult := False;
+    end;
     OctoPrintPort := InputQueryWizardPage.Values[0];
     WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
   end;
-  if (CurPageID = wpSelectDir) or ((CurPageID = InputQueryWizardPage.ID) and WizardIsComponentSelected('add_instance')) then 
+  if (CurPageID = wpSelectDir) or ((CurPageID = InputQueryWizardPage.ID) and InstalledOnce) then 
   begin
     DataDirPage.Values[0] := WizardDirValue() + '\basedir\' + OctoPrintPort;
     WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
@@ -148,7 +229,7 @@ begin
   begin
     OctoPrintBasedir := DataDirPage.Values[0];
   end;
-  Result := True;
+  Result := bResult;
 end;
 
 procedure rename_config();
@@ -195,24 +276,7 @@ begin
   end;
 end;
 
-function GetOctoPrintInstances(): TArrayOfString;
-var
-  Names: TArrayOfString;
-  I: Integer;
-  S: String;
-begin
-  if RegGetValueNames(HKEY_CURRENT_USER, 'Control Panel\Mouse', Names) then
-  begin
-    S := '';
-    for I := 0 to GetArrayLength(Names)-1 do
-      S := S + Names[I] + #13#10;
-    MsgBox('List of values:'#13#10#13#10 + S, mbInformation, MB_OK);
-  end else
-  begin
-    // add any code to handle failure here
-  end;
-  Result := Names
-end;
+
 
 procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin
@@ -234,3 +298,4 @@ Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initi
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
 Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"
+Name: "{group}\Uninstall OctoPrint"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"

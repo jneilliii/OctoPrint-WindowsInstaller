@@ -37,9 +37,10 @@ jobs:
         certificate: '${{ secrets.CERTIFICATE }}'
         cert-password: '${{ secrets.PASSWORD }}'
         cert-sha1: '${{ secrets.CERTHASH }}'
-        cert-description: 'OctoPrint Installer'
+        cert-description: 'OctoPrint Installer by jneilliii'
         folder: 'Output'
         recursive: false
+        timestamp-server: 'http://timestamp.digicert.com'
 
     - name: 🧹 Delete Existing Release and Tag
       uses: dev-drprasad/delete-tag-and-release@v0.2.0

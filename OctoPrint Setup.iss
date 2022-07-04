@@ -38,7 +38,7 @@ WizardImageFile=WizModernImage-OctoPrint*.bmp
 WizardSmallImageFile=WizModernSmallImage-OctoPrint*.bmp
 DisableWelcomePage=False
 DisableDirPage=False
-Uninstallable=IsComponentSelected('initial_instance')
+Uninstallable=WizardIsComponentSelected('initial_instance')
 
 [Run]
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle; Description: "Install Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
@@ -124,7 +124,7 @@ begin
     Result := True;
   end;
 
-  if (PageID = wpSelectDir) and IsComponentSelected('add_instance') then
+  if (PageID = wpSelectDir) and WizardIsComponentSelected('add_instance') then
   begin
     Result := True;
   end;

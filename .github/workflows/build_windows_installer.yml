@@ -32,14 +32,14 @@ jobs:
       shell: cmd
 
     - name: ✏️ Sign Installer
-      uses: GermanBluefox/code-sign-action@v7
+      uses: GabrielAcostaEngler/signtool-code-sign@1.0.6
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
-        password: '${{ secrets.PASSWORD }}'
-        certificatesha1: '${{ secrets.CERTHASH }}'
-        certificatename: '${{ secrets.CERTNAME }}'
+        cert-password: '${{ secrets.PASSWORD }}'
+        cert-sha1: '${{ secrets.CERTHASH }}'
+        cert-description: 'OctoPrint Installer'
         folder: 'Output'
-        recursive: true
+        recursive: false
 
     - name: 🧹 Delete Existing Release and Tag
       uses: dev-drprasad/delete-tag-and-release@v0.2.0

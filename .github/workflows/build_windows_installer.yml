@@ -32,9 +32,12 @@ jobs:
       shell: cmd
 
     - name: ✏️ Sign Installer
-      uses: dlemstra/code-sign-action@v1
+      uses: GermanBluefox/code-sign-action@v7
       with:
-        certificate: '${{ secrets.CODESIGN }}'
+        certificate: '${{ secrets.CERTIFICATE }}'
+        password: '${{ secrets.PASSWORD }}'
+        certificatesha1: '${{ secrets.CERTHASH }}'
+        certificatename: '${{ secrets.CERTNAME }}'
         folder: 'Output'
         recursive: true
 

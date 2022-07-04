@@ -40,6 +40,12 @@ jobs:
         certificatename: '${{ secrets.CERTNAME }}'
         folder: 'Output'
         recursive: true
+    - name: ✏️ Sign the installer
+      uses: dlemstra/code-sign-action@v1
+      with:
+        certificate: '${{ secrets.CODESIGN }}'
+        folder: 'files'
+        recursive: true
 
     - name: 🧹 Delete Existing Release and Tag
       uses: dev-drprasad/delete-tag-and-release@v0.2.0

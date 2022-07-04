@@ -136,45 +136,39 @@ begin
   Result := RegKeyExists(HKLM, 'Software\OctoPrint\Instances');
 end;
 
-procedure btnListInstancesOnClick(Sender: TObject);
+function CheckPortOccupied(Port:String):Boolean;
+var
+  ResultCode: Integer;
 begin
-  GetOctoPrintInstances();
+  Exec(ExpandConstant('{cmd}'), '/C netstat -na | findstr'+' /C:":'+Port+' "', '', 0,
+       ewWaitUntilTerminated, ResultCode);
+  if ResultCode <> 1 then 
+  begin
+    Result := True; 
+  end
+    else
+  begin
+    Result := False;
+  end;
 end;
 
 procedure InitializeWizard;
 var
-  sComponetSelectMessage: string;
   sInputQueryMessage: string;  
-  btnListInstances: TButton; 
 begin
 // Custom Component Select Page
   if InstalledOnce then 
   begin
-    sComponetSelectMessage := 'You are installing a new instance of OctoPrint, click Next.';
     sInputQueryMessage := 'You are installing a new instance of OctoPrint. Enter a port number that has not been previouslly used, and then click Next.' + #13#10#13#10'Currently Used Ports:'#13#10 + GetOctoPrintInstancesAsString(GetOctoPrintInstances);
   end else 
   begin      
-    sComponetSelectMessage := 'You are installing OctoPrint for the first time, click Next.';
     sInputQueryMessage := 'You are installing OctoPrint for the first time, click Next.';
   end;
-    
-//  ComponentSelectPage := CreateInputQueryPage(wpWelcome, 'OctoPrint Setup', 'What type of installation is being performed?', sComponetSelectMessage);
-//  WizardForm.ComponentsList.Parent := ComponentSelectPage.Surface;
 
 // OctoPrint Port Dialog Page     
   InputQueryWizardPage := CreateInputQueryPage(wpWelcome, 'OctoPrint Setup', 'Which port to use for this instance?', sInputQueryMessage);
   InputQueryWizardPage.Add('Port:', False);
   InputQueryWizardPage.Values[0] := GetPreviousData('OctoPrintPort', '');
-  
-//  if InstalledOnce then begin
-//    btnListInstances := TNewButton.Create(InputQueryWizardPage);
-//    btnListInstances.Parent := InputQueryWizardPage.Surface;
-//    btnListInstances.Caption := 'List Instances';
-//    btnListInstances.Top := 100;
-//    btnListInstances.Left := 10;
-//    btnListInstances.Height := WizardForm.CancelButton.Height;
-//    btnListInstances.OnClick := @btnListInstancesOnClick;
-//  end;
   
 // OctoPrint Basedir Selection Page  
   DataDirPage := CreateInputDirPage(wpSelectDir,
@@ -212,9 +206,10 @@ begin
   bResult := True;   
   if CurPageID = InputQueryWizardPage.ID then 
   begin
-    if (InputQueryWizardPage.Values[0] = '') or InstanceExists(GetOctoPrintInstances, InputQueryWizardPage.Values[0]) then
+    if (InputQueryWizardPage.Values[0] = '') or InstanceExists(GetOctoPrintInstances, InputQueryWizardPage.Values[0]) or CheckPortOccupied(InputQueryWizardPage.Values[0]) then
     begin
       bResult := False;
+      MsgBox('Port ' + InputQueryWizardPage.Values[0] + ' is already in use.', mbCriticalError, MB_OK);
     end;
     OctoPrintPort := InputQueryWizardPage.Values[0];
     WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';

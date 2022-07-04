@@ -11,10 +11,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: 📝 Checkout
+    - name: 📌 Checkout
       uses: actions/checkout@v2
 
-    - name: 🔎 Get OctoPrint Version
+    - name: 👀 Get OctoPrint Version
       id: octoprint_version
       uses: pozetroninc/github-action-get-latest-release@master
       with:
@@ -31,8 +31,8 @@ jobs:
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
       shell: cmd
 
-    - name: Sign Executable
-      uses: DanaBear/code-sign-action@v4
+    - name: ✏️ Sign Installer
+      uses: Dana-Prajea/code-sign-action@v4
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
         password: '${{ secrets.PASSWORD }}'

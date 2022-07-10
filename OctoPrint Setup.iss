@@ -36,9 +36,8 @@ DisableReadyPage=True
 UninstallDisplayIcon={app}\OctoPrint.ico    
 WizardImageFile=WizModernImage-OctoPrint*.bmp
 WizardSmallImageFile=WizModernSmallImage-OctoPrint*.bmp
-DisableWelcomePage=False
-DisableDirPage=False
-Uninstallable=InstalledOnce
+DisableWelcomePage=no
+DisableDirPage=no
 FlatComponentsList=False
 AppendDefaultGroupName=False
 
@@ -62,6 +61,9 @@ Name: "add_instance"; Description: "Adding New Instance"; Flags: exclusive; Chec
 
 [ThirdParty]
 UseRelativePaths=True
+
+[Tasks]
+Name: "include_ffmpeg"; Description: "Include ffmpeg"
 
 [Code]
 function InitializeSetup: Boolean; 
@@ -244,6 +246,18 @@ begin
   end;
 end; 
 
+procedure update_config_ffmpeg();
+var
+  ANSIStr: AnsiString;
+begin
+  if LoadStringFromFile(OctoPrintBasedir + '\config.yaml', ANSIStr) then
+  begin 
+    ANSIStr := ANSIStr + #13#10 + 'webcam:' + #13#10 + '  ffmpeg: ' + ExpandConstant(CurrentFilename);
+    SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
+  end;
+end;
+  
+
 procedure rename_service_wrapper();
 var
   FolderPath: string;
@@ -289,6 +303,7 @@ Source: "OctoPrint.ico"; DestDir: "{app}"; Components: initial_instance
 Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
+Source: "ffmpeg.exe"; DestDir: "{app}"; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"

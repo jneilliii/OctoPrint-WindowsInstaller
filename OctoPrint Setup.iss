@@ -239,6 +239,7 @@ begin
     if StringChangeEx(UnicodeStr, '####APPDIR####', WrapperPath, True) > 0 then
       if DirExists(ExpandConstant(OctoPrintBasedir)) = False then
         ForceDirectories(ExpandConstant(OctoPrintBasedir));
+      StringChangeEx(UnicodeStr, '####PIPPATH####', ExpandConstant('{app}\WPy64-31040\python-3.10.4.amd64\Scripts\pip.exe'), True);
       SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), AnsiString(UnicodeStr), False);
   end;
 end; 

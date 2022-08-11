@@ -1,5 +1,5 @@
 server:
   commands:
     localPipCommand: ####PIPPATH####
-    serverRestartCommand: "####APPDIR####" restart!
-    systemShutdownCommand: "####APPDIR####" stop
+    serverRestartCommand: "\"####APPDIR####\" restart!"
+    systemShutdownCommand: "\"####APPDIR####\" stop"

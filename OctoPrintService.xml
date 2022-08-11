@@ -32,7 +32,7 @@
   <description>Service wrapper for OctoPrint (powered by WinSW).</description>
   <!-- Path to the executable, which should be started -->
   <executable>####EXEPATH####</executable>
-  <arguments>serve --basedir=####BASEDIR#### --port ####PORT####</arguments>
+  <arguments>-m octoprint serve --basedir="####BASEDIR####" --port ####PORT####</arguments>
   <onfailure action="restart" delay="10 sec"/>
   <interactive/>
 </service>

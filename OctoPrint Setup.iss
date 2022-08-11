@@ -280,7 +280,7 @@ begin
   if LoadStringFromFile(ExpandConstant('{app}\OctoPrintService.xml'), ANSIStr) then
   begin
     UnicodeStr := String(ANSIStr);
-    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31040\python-3.10.4.amd64\Scripts\octoprint.exe'), True) 
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31040\python-3.10.4.amd64\python.exe'), True) 
     StringChangeEx(UnicodeStr, '####BASEDIR####', DataDirPage.Values[0], True) 
     StringChangeEx(UnicodeStr, '####PORT####', InputQueryWizardPage.Values[0], True)
     SaveStringToFile(ExpandConstant('{app}\OctoPrintService' + OctoPrintPort + '.xml'), AnsiString(UnicodeStr), False);

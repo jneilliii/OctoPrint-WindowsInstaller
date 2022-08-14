@@ -42,8 +42,9 @@ FlatComponentsList=False
 AppendDefaultGroupName=False
 
 [Run]
-Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle; Description: "Install Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
-Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle; Description: "Start Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle runascurrentuser; Description: "Install Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle runascurrentuser; Description: "Start Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"
+Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: postinstall shellexec waituntilidle runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
 
 [UninstallRun]
 ;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden
@@ -63,7 +64,8 @@ Name: "add_instance"; Description: "Adding New Instance"; Flags: exclusive; Chec
 UseRelativePaths=True
 
 [Tasks]
-Name: "include_ffmpeg"; Description: "Include ffmpeg"
+Name: "include_ffmpeg"; Description: "Include ffmpeg"; Check: not InstalledOnce
+Name: "include_yawcam"; Description: "Include YawCam"; Check: not InstalledOnce
 
 [Code]
 function InitializeSetup: Boolean; 
@@ -76,9 +78,56 @@ var
   InputQueryWizardPage: TInputQueryWizardPage;
   DataDirPage: TInputDirWizardPage;
   ComponentSelectPage: TWizardPage;
+  YawCamSelectIP: TInputOptionWizardPage;
   WrapperPath: String;
   OctoPrintPort: String;
-  OctoPrintBasedir: String;
+  OctoPrintBasedir: String;     
+  ip_address_list : TStringList; 
+
+
+
+const
+ ERROR_INSUFFICIENT_BUFFER = 122;
+
+function GetIpAddrTable( pIpAddrTable: Array of Byte;
+  var pdwSize: Cardinal; bOrder: WordBool ): DWORD;
+external 'GetIpAddrTable@IpHlpApi.dll stdcall';
+
+procedure GetIpAddresses(Addresses : TStringList);
+var 
+ Size : Cardinal;
+ Buffer : Array of Byte;
+ IpAddr : String;
+ AddrCount : Integer;
+ I, J : Integer;
+begin
+  { Find Size }
+  if GetIpAddrTable(Buffer,Size,False) = ERROR_INSUFFICIENT_BUFFER then
+  begin
+     { Allocate Buffer with large enough size }
+     SetLength(Buffer,Size);
+     { Get List of IP Addresses into Buffer }
+     if GetIpAddrTable(Buffer,Size,True) = 0 then
+     begin
+       { Find out how many addresses will be returned. }
+       AddrCount := (Buffer[1] * 256) + Buffer[0];
+       { Loop through addresses. }
+       For I := 0 to AddrCount - 1 do
+       begin
+         IpAddr := '';
+         { Loop through each byte of the address }
+         For J := 0 to 3 do
+         begin
+           if J > 0 then
+             IpAddr := IpAddr + '.';
+           { Navigate through record structure to find correct byte of Addr }
+           IpAddr := IpAddr + IntToStr(Buffer[I*24+J+4]);
+         end;
+         Addresses.Add(IpAddr);
+       end;
+     end;
+  end;
+end;
 
 function GetServiceWrapperPath(Param: string): String;
 begin
@@ -157,7 +206,9 @@ end;
 
 procedure InitializeWizard;
 var
-  sInputQueryMessage: string;  
+  sInputQueryMessage: string; 
+  ip_address: string;
+  counter: integer;
 begin
 // Custom Component Select Page
   if InstalledOnce then 
@@ -171,7 +222,7 @@ begin
 // OctoPrint Port Dialog Page     
   InputQueryWizardPage := CreateInputQueryPage(wpWelcome, 'OctoPrint Setup', 'Which port to use for this instance?', sInputQueryMessage);
   InputQueryWizardPage.Add('Port:', False);
-  InputQueryWizardPage.Values[0] := GetPreviousData('OctoPrintPort', '');
+  InputQueryWizardPage.Values[0] := GetPreviousData('OctoPrintPort', '5000');
   
 // OctoPrint Basedir Selection Page  
   DataDirPage := CreateInputDirPage(wpSelectDir,
@@ -180,6 +231,24 @@ begin
     False, '');
   DataDirPage.Add('Basedir Path:');
   DataDirPage.Values[0] := GetPreviousData('DataDir', WizardDirValue() + '\basedir');
+
+// YawCam Select IP Page
+
+  YawCamSelectIP := CreateInputOptionPage(wpSelectTasks,
+  'YawCam IP Selection', 'What IP should YawCam be configured for?',
+  'Select the IP address that YawCam will use and automatically be added to OctoPrint''s config.yaml.',
+  True, False);
+
+  ip_address_list := TStringList.Create;
+  GetIpAddresses(ip_address_list);
+  for counter := 0 to ip_address_list.Count - 1 do
+  begin
+    ip_address := ip_address_list[counter];
+    if not VarIsNull(ip_address) then
+    begin
+      YawCamSelectIP.Add(ip_address);
+    end;
+  end;    
 
 // Initialize contstants
   OctoPrintPort := InputQueryWizardPage.Values[0];  
@@ -198,7 +267,12 @@ begin
   if (PageID = wpSelectDir) and InstalledOnce then
   begin
     Result := True;
-  end;   
+  end;  
+  
+  if (PageID = YawCamSelectIP.ID) and not WizardIsTaskSelected('include_yawcam') then
+  begin
+    Result := True;
+  end;
 end;
 
 
@@ -256,7 +330,22 @@ begin
     SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
   end;
 end;
-  
+
+procedure update_config_yawcam();
+var
+  ANSIStr: AnsiString;  
+begin
+  if LoadStringFromFile(OctoPrintBasedir + '\config.yaml', ANSIStr) then
+  begin
+    if Pos('webcam', ANSIStr) = 0 then
+    begin
+      ANSIStr := ANSIStr + #13#10 + 'webcam:';
+    end;
+    ANSIStr := ANSIStr + #13#10 + '  snapshot: http://' + ip_address_list[YawCamSelectIP.SelectedValueIndex] + ':8888/out.jpg';  
+    ANSIStr := ANSIStr + #13#10 + '  stream: http://' + ip_address_list[YawCamSelectIP.SelectedValueIndex] + ':8081/video.mjpg';
+    SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
+  end;
+end;  
 
 procedure rename_service_wrapper();
 var
@@ -291,7 +380,7 @@ procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin
   { Store the settings so we can restore them next time }
   SetPreviousData(PreviousDataKey, 'DataDir', DataDirPage.Values[0]);  
-  SetPreviousData(PreviousDataKey, 'OctoPrintPort', InputQueryWizardPage.Values[0]);
+  SetPreviousData(PreviousDataKey, 'OctoPrintPort', InputQueryWizardPage.Values[0]); 
 end;
 
 [Languages]
@@ -304,6 +393,7 @@ Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance a
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
 Source: "ffmpeg.exe"; DestDir: "{app}"; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
+Source: "yawcam_install.exe"; DestDir: "{app}"; Components: initial_instance; Tasks: include_yawcam; AfterInstall: update_config_yawcam
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"

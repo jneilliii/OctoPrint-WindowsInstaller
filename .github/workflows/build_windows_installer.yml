@@ -23,7 +23,7 @@ jobs:
 
     - name: 🔨 Install OctoPrint into WinPython
       run: |
-        WPy64-31040\Scripts\python.bat -m pip install OctoPrint==${{ steps.octoprint_version.outputs.release }}
+        WPy64-31050\Scripts\python.bat -m pip install OctoPrint==${{ steps.octoprint_version.outputs.release }}
       shell: cmd
 
     - name: 🔨 Build Installer

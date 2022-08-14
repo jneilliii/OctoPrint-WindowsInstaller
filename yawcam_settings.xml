@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_341" class="java.beans.XMLDecoder">
+ <object class="yawcam.SettingsHolder" id="SettingsHolder0">
+  <void property="cam">
+   <int>1</int>
+  </void>
+  <void property="conPublicIP">
+   <string></string>
+  </void>
+  <void property="conUpnp">
+   <boolean>false</boolean>
+  </void>
+  <void property="file_int">
+   <long>30</long>
+  </void>
+  <void property="firstTime">
+   <boolean>false</boolean>
+  </void>
+  <void property="ftp_int">
+   <long>30</long>
+  </void>
+  <void id="Point0" property="pos_main">
+   <void class="java.awt.Point" method="getField">
+    <string>x</string>
+    <void method="set">
+     <object idref="Point0"/>
+     <int>446</int>
+    </void>
+   </void>
+   <void class="java.awt.Point" method="getField">
+    <string>y</string>
+    <void method="set">
+     <object idref="Point0"/>
+     <int>307</int>
+    </void>
+   </void>
+  </void>
+  <void property="s_http_o">
+   <boolean>true</boolean>
+  </void>
+  <void property="s_prev">
+   <boolean>false</boolean>
+  </void>
+  <void property="s_stream_o">
+   <boolean>true</boolean>
+  </void>
+  <void property="stream_quality">
+   <float>1.0</float>
+  </void>
+  <void property="stream_type">
+   <int>3</int>
+  </void>
+  <void property="ver">
+   <string>0.7.0</string>
+  </void>
+ </object>
+</java>

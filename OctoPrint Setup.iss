@@ -42,9 +42,11 @@ FlatComponentsList=False
 AppendDefaultGroupName=False
 
 [Run]
-Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle runascurrentuser; Description: "Install Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
-Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden shellexec postinstall waituntilidle runascurrentuser; Description: "Start Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"
-Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: postinstall shellexec waituntilidle runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
+Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden postinstall waituntilidle runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden postinstall waituntilidle runascurrentuser; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"
+Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser postinstall runhidden; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
+Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser postinstall runhidden; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
 
 [UninstallRun]
 ;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden
@@ -347,6 +349,17 @@ begin
   end;
 end;  
 
+procedure update_service_yawcam();
+var
+  ANSIStr: AnsiString;  
+begin
+  if LoadStringFromFile(ExpandConstant('{commonpf32}\YawCam\service_profile.cfg'), ANSIStr) then
+  begin 
+    ANSIStr := ExpandConstant('{app}');
+    SaveStringToFile(ExpandConstant('{commonpf32}\YawCam\service_profile.cfg'), ANSIStr, False);
+  end;
+end;
+
 procedure rename_service_wrapper();
 var
   FolderPath: string;
@@ -394,6 +407,7 @@ Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Componen
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
 Source: "ffmpeg.exe"; DestDir: "{app}"; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
 Source: "yawcam_install.exe"; DestDir: "{app}"; Components: initial_instance; Tasks: include_yawcam; AfterInstall: update_config_yawcam
+Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_instance; Tasks: include_yawcam
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"

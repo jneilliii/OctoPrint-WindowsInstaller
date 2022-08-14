@@ -1,0 +1,18 @@
+Distributable Code Files for Visual Studio 2019
+-----------------------------------------------
+https://docs.microsoft.com/en-us/visualstudio/releases/2019/redistribution#-distributable-code-files-for-visual-studio-2019
+
+The following section is the "REDIST list" that is referenced in the "Distributable Code" section of the Microsoft Software License Terms for Visual Studio Enterprise 2019, Visual Studio Professional 2019, Visual Studio Community 2019 ("the software"). If you have a validly licensed copy of such software, you may copy and distribute with your program the unmodified form of the files listed below, subject to the License Terms for the software.
+
+
+Visual C++ Runtime Files
+------------------------
+https://docs.microsoft.com/en-us/visualstudio/releases/2019/redistribution#visual-c-runtime-files
+
+Subject to the License Terms for the software, you may copy and distribute with your program any of the files within the following folder and its subfolders except as noted below. You may not modify these files.
+
+    [VisualStudioFolder]\VC\redist
+    You may not distribute the contents of the following folders:
+        [VisualStudioFolder]VC\Redist\MSVC\[version]\debug_nonredist
+        [VisualStudioFolder]VC\Redist\MSVC\[version]\debug_nonredist
+        [VisualStudioFolder]\VC\Redist\MSVC\[version]\onecore\debug_nonredist

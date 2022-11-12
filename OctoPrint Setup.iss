@@ -42,11 +42,12 @@ FlatComponentsList=False
 AppendDefaultGroupName=False
 
 [Run]
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"; Tasks: install_service
+Filename: "http://localhost:{code:GetOctoPrintPort}/"; Flags: runasoriginaluser shellexec postinstall; Description: "Open OctoPrint to complete initial setup."; Tasks: install_service
 Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
-Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden postinstall waituntilidle runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"
-Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden postinstall waituntilidle runascurrentuser; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"
-Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser postinstall runhidden; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
-Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser postinstall runhidden; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
+Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser runhidden postinstall; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
+Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
 
 [UninstallRun]
 ;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden
@@ -56,7 +57,7 @@ Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; 
 ;Type: filesandordirs; Name: "{app}\*"
 
 [Registry]
-Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty
+Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty uninsdeletevalue
 
 [Components]
 Name: "initial_instance"; Description: "Initial Install"; Flags: exclusive; Check: not InstalledOnce
@@ -66,8 +67,9 @@ Name: "add_instance"; Description: "Adding New Instance"; Flags: exclusive; Chec
 UseRelativePaths=True
 
 [Tasks]
-Name: "include_ffmpeg"; Description: "Include ffmpeg"; Check: not InstalledOnce
-Name: "include_yawcam"; Description: "Include YawCam"; Check: not InstalledOnce
+Name: "install_service"; Description: "Install OctoPrint as a Service"
+Name: "include_ffmpeg"; Description: "Include ffmpeg (for timelapse support)"; Check: not InstalledOnce
+Name: "include_yawcam"; Description: "Include YawCam (for webcam support)"; Flags: unchecked; Check: not InstalledOnce
 
 [Code]
 function InitializeSetup: Boolean; 
@@ -396,6 +398,14 @@ begin
   SetPreviousData(PreviousDataKey, 'OctoPrintPort', InputQueryWizardPage.Values[0]); 
 end;
 
+function StartServiceChecked(): boolean;
+var
+  bResult: boolean;
+begin
+  bResult := WizardForm.RunList.ItemEnabled[0];  
+  Result := bResult;
+end;
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -411,5 +421,6 @@ Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_ins
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
-Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"
+Name: "{group}\OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "http://localhost:{code:GetOctoPrintPort}/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
+Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; Tasks: install_service
 Name: "{group}\Uninstall OctoPrint"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"

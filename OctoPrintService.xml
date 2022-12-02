@@ -35,4 +35,5 @@
   <arguments>-m octoprint serve --basedir="####BASEDIR####" --port ####PORT####</arguments>
   <onfailure action="restart" delay="10 sec"/>
   <interactive/>
+  <log mode="none"/>
 </service>

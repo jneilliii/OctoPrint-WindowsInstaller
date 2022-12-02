@@ -33,7 +33,7 @@ jobs:
 
     - name: 🔨 Generate CA
       id: write_file
-      uses: timheuer/base64-to-file@v1.1
+      uses: timheuer/base64-to-file@v1.2
       with:
         fileName: 'OctoPrintCA.crt'
         encodedString: ${{ secrets.OCTOPRINT_CA }}

@@ -71,4 +71,4 @@ jobs:
         fail_on_unmatched_files: true
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |
-          Output\OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe
+          Output/OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe

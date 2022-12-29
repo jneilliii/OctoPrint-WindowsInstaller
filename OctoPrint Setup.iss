@@ -33,7 +33,7 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 DisableReadyPage=True
-UninstallDisplayIcon={app}\OctoPrint.ico    
+UninstallDisplayIcon={app}\OctoPrint.ico
 WizardImageFile=WizModernImage-OctoPrint*.bmp
 WizardSmallImageFile=WizModernSmallImage-OctoPrint*.bmp
 DisableWelcomePage=no
@@ -41,6 +41,7 @@ DisableDirPage=no
 FlatComponentsList=False
 AppendDefaultGroupName=False
 UsePreviousLanguage=no
+UninstallDisplayName=OctoPrint on port {code:GetOctoPrintPort}
 
 [Run]
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service
@@ -452,4 +453,3 @@ Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_ins
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
 Name: "{group}\OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "http://localhost:{code:GetOctoPrintPort}/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
 Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; Tasks: install_service
-Name: "{group}\Uninstall OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0

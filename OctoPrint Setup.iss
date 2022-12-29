@@ -439,7 +439,7 @@ end;
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "WPy64-31050\*"; DestDir: "{app}\WPy64-31050"; Flags: recursesubdirs createallsubdirs ignoreversion onlyifdoesntexist; Components: initial_instance
+Source: "WPy64-31050\*"; DestDir: "{app}\WPy64-31050"; Flags: recursesubdirs createallsubdirs ignoreversion onlyifdoesntexist uninsneveruninstall; Components: initial_instance
 Source: "OctoPrint.ico"; DestDir: "{app}"; Components: initial_instance
 Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config

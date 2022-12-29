@@ -8,6 +8,7 @@
 #define MyAppVersion OctoPrintVersion
 #define MyAppPublisher "OctoPrint"
 #define MyAppURL "https://www.octoprint.org/"
+#define MyAppSupportURL "https://github.com/jneilliii/OctoPrint-WindowsInstaller/issues"
 #define MyAppExeName "octoprint.exe" 
 #define public Dependency_NoExampleSetup
 #include "CodeDependencies.iss"  
@@ -21,7 +22,7 @@ AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
+AppSupportURL={#MyAppSupportURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={code:GetDefaultDirName}
 DefaultGroupName={#MyAppName}

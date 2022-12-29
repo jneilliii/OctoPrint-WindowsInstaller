@@ -72,7 +72,7 @@ UseRelativePaths=True
 
 [Tasks]
 Name: "install_service"; Description: "Install OctoPrint as a Service"
-Name: "include_ffmpeg"; Description: "Include ffmpeg (for timelapse support)"; Check: not InstalledOnce
+Name: "include_ffmpeg"; Description: "Include ffmpeg (for timelapse support)"
 Name: "include_yawcam"; Description: "Include YawCam (for webcam support)"; Flags: unchecked; Check: not InstalledOnce
 Name: "add_firewall_exception"; Description: "Add firewall rule policy exception"
 

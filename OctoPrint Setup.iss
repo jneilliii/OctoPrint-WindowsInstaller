@@ -444,7 +444,7 @@ Source: "OctoPrint.ico"; DestDir: "{app}"; Components: initial_instance
 Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
-Source: "ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
+Source: "ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
 Source: "yawcam_install.exe"; DestDir: "{app}"; Components: initial_instance; Tasks: include_yawcam; AfterInstall: update_config_yawcam
 Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_instance; Tasks: include_yawcam
 

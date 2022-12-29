@@ -16,6 +16,6 @@ To continue with the installation press the `More info` link and then press the 
 
 ![smart screen 2](smartscreen_2.png)
 
-You may be present with UAC prompt for admin rights once the install starts. Press the `Yes` button and continue with the installation wizard. 
+You may be presented with a UAC prompt for admin rights once the install starts. Press the `Yes` button and continue with the installation wizard. 
 
 ![UAC Prompt](uac_prompt.png)

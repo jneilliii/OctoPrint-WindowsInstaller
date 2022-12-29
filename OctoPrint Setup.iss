@@ -48,6 +48,7 @@ Filename: "http://localhost:{code:GetOctoPrintPort}/"; Flags: runasoriginaluser 
 Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
 Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser runhidden postinstall; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
 Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""OctoPrint"" dir=in protocol=TCP localport={code:GetOctoPrintPort} action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add Firewall Exception"; StatusMsg: "Adding firewall exception rule"; Components: initial_instance add_instance
 
 [UninstallRun]
 ;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden

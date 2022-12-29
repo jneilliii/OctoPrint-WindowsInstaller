@@ -15,7 +15,7 @@
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId="OctoPrint{code:GetOctoPrintPort}"
+AppId={{333BC575-A27C-4E6C-BE2B-59E5AEE715F3}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -40,7 +40,6 @@ DisableWelcomePage=no
 DisableDirPage=no
 FlatComponentsList=False
 AppendDefaultGroupName=False
-UsePreviousLanguage=no
 
 [Run]
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service

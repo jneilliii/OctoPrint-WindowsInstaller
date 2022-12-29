@@ -12,11 +12,11 @@ jobs:
 
     steps:
     - name: 📌 Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: 👀 Get OctoPrint Version
       id: octoprint_version
-      uses: pozetroninc/github-action-get-latest-release@master
+      uses: loeken/github-action-get-latest-release@master
       with:
         repository: OctoPrint/OctoPrint
         excludes: prerelease, draft

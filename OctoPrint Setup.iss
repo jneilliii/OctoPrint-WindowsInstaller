@@ -23,7 +23,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName=C:\{#MyAppName}
+DefaultDirName={code:GetDefaultDirName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=Output
@@ -432,7 +432,7 @@ begin
   begin
     // Successfully read the value
   end;
-  Resulr := DirName;
+  Result := DirName;
 end;
 
 [Languages]

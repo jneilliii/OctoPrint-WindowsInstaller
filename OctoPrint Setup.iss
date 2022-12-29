@@ -452,4 +452,4 @@ Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_ins
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
 Name: "{group}\OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "http://localhost:{code:GetOctoPrintPort}/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
 Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; Tasks: install_service
-Name: "{group}\Uninstall OctoPrint"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"
+Name: "{group}\Uninstall OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0

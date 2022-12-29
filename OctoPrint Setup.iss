@@ -51,8 +51,8 @@ Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; 
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""OctoPrint"" dir=in protocol=TCP localport={code:GetOctoPrintPort} action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add Firewall Exception"; StatusMsg: "Adding firewall exception rule"; Components: initial_instance add_instance
 
 [UninstallRun]
-;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden
-;Filename: "{app}\OctoPrintService{code: GetOctoPrintPort}.exe"; Parameters: "uninstall --no-elevate"; WorkingDir: "{app}"; Flags: runhidden
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "StopService"; Tasks: install_service
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "uninstall --no-elevate"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "DelService"; Tasks: install_service
 
 [UninstallDelete]
 ;Type: filesandordirs; Name: "{app}\*"

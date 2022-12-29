@@ -222,7 +222,7 @@ begin
 // Custom Component Select Page
   if InstalledOnce then 
   begin
-    sInputQueryMessage := 'You are installing a new instance of OctoPrint. It is best to select the same installation folder as the initial install. Enter a port number that has not been previouslly used, and then click Next.' + #13#10#13#10'Currently Used Ports:'#13#10 + GetOctoPrintInstancesAsString(GetOctoPrintInstances);
+    sInputQueryMessage := 'You are installing a new instance of OctoPrint. Enter a port number that has not been previouslly used, and then click Next.' + #13#10#13#10'Currently Used Ports:'#13#10 + GetOctoPrintInstancesAsString(GetOctoPrintInstances);
   end else 
   begin      
     sInputQueryMessage := 'You are installing OctoPrint for the first time, click Next.';
@@ -273,10 +273,10 @@ begin
     Result := True;
   end;
 
-  //if (PageID = wpSelectDir) and InstalledOnce then
-  //begin
-  //  Result := True;
-  //end;  
+  if (PageID = wpSelectDir) and InstalledOnce then
+  begin
+    Result := True;
+  end;  
   
   if (PageID = YawCamSelectIP.ID) and not WizardIsTaskSelected('include_yawcam') then
   begin

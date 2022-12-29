@@ -15,7 +15,7 @@
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{333BC575-A27C-4E6C-BE2B-59E5AEE715F3}
+AppId={code:GetAppID}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -40,6 +40,7 @@ DisableWelcomePage=no
 DisableDirPage=no
 FlatComponentsList=False
 AppendDefaultGroupName=False
+UsePreviousLanguage=no
 
 [Run]
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service
@@ -407,6 +408,17 @@ var
 begin
   bResult := WizardForm.RunList.ItemEnabled[0];  
   Result := bResult;
+end;
+
+function GetAppID(const Value: string): string;
+var
+  AppID: string;
+begin
+  AppID := '{BBCED751-C716-423E-BEB9-57F817B1E3EA}';
+  if Assigned(InputQueryWizardPage) then
+    Result := AppID + OctoPrintPort
+  else
+    Result := AppID;
 end;
 
 [Languages]

@@ -422,7 +422,7 @@ begin
     Result := AppID;
 end;
 
-function GetDefaultDirName(): string;
+function GetDefaultDirName(const Value: string): string;
 var
   DirName: String;
 begin

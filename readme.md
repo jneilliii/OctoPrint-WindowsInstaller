@@ -10,7 +10,7 @@ The minimum requirements to use the Windows Installer are:
 
 ## Usage
 
-Head to the [latest release](https://github.com/jneilliii/OctoPrint-WindowsInstaller/releases/latest] and download the built installer from the bottom of the release.
+Head to the [latest release](https://github.com/jneilliii/OctoPrint-WindowsInstaller/releases/latest) and download the built installer from the bottom of the release.
 
 While downloading the installer exe your browser may prompt that the file is dangerous, accept any warnings as shown below in Chrome by selecting `Keep`.
 

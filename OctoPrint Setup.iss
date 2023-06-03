@@ -45,6 +45,7 @@ UsePreviousLanguage=no
 UninstallDisplayName=OctoPrint on port {code:GetOctoPrintPort}
 
 [Run]
+Filename: "{app}\vs_BuildTools.exe"; Parameters: "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --quiet --nocache --wait"; WorkingDir: "{app}"; Flags: runascurrentuser; Description: "Install Visual Studio Build Tools"; StatusMsg: "Installing Visual Studio Build Tools"; Components: initial_instance
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"; Tasks: install_service
 Filename: "http://localhost:{code:GetOctoPrintPort}/"; Flags: runasoriginaluser shellexec postinstall; Description: "Open OctoPrint to complete initial setup."; Tasks: install_service
@@ -82,7 +83,6 @@ Name: "add_firewall_exception"; Description: "Add firewall rule policy exception
 function InitializeSetup: Boolean; 
 begin 
   Dependency_AddVC2013;
-  Dependency_AddVSBuildTools;
   Result := True;          
 end;
 
@@ -464,7 +464,7 @@ Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initi
 Source: "ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
 Source: "yawcam_install.exe"; DestDir: "{app}"; Components: initial_instance; Tasks: include_yawcam; AfterInstall: update_config_yawcam
 Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_instance; Tasks: include_yawcam
-Source: "vswhere.exe"; Flags: dontcopy noencryption
+Source: "vs_BuildTools.exe"; DestDir: "{app}"; Components: initial_instance
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"

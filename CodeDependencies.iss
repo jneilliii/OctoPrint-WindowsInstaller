@@ -232,6 +232,17 @@ begin
   Result := ShellExec('', ExpandConstant('{tmp}{\}') + 'netcorecheck' + Dependency_ArchSuffix + '.exe', Version, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
 end;
 
+function Dependency_IsVSCodeProductsInstalled(const Products: String): Boolean;
+var
+  ResultCode: Integer;
+begin
+  // source code: https://github.com/Microsoft/vswhere
+  if not FileExists(ExpandConstant('{tmp}{\}') + 'vswhere.exe') then begin
+    ExtractTemporaryFile('vswhere.exe');
+  end;
+  Result := ShellExec('', ExpandConstant('{tmp}{\}') + 'vswhere.exe', '-latest -products * -requires ' + Products + ' -property isComplete', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+end;
+
 procedure Dependency_AddDotNet35;
 begin
   // https://dotnet.microsoft.com/download/dotnet-framework/net35-sp1
@@ -484,6 +495,18 @@ begin
   end;
 end;
 
+procedure Dependency_AddVSBuildTools;
+begin
+  // https://visualstudio.microsoft.com/downloads/
+  if not Dependency_IsVSCodeProductsInstalled('Microsoft.VisualStudio.Component.VC.CMake.Project Microsoft.VisualStudio.Component.VC.Tools.x86.x64 Microsoft.VisualStudio.Workload.VCTools') then begin
+    Dependency_Add('vs_BuildTools.exe',
+      '--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --quiet --nocache --wait',
+      'Visual Studio Build Tools',
+      'https://aka.ms/vs/17/release/vs_BuildTools.exe',
+      '', False, False);
+  end;
+end;
+
 procedure Dependency_AddDirectX;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=35
@@ -682,6 +705,10 @@ Name: de; MessagesFile: "compiler:Languages\German.isl"
 ; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
 Source: "netcorecheck.exe"; Flags: dontcopy noencryption
 Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
+#endif
+
+#ifdef UseVSBuildTools
+Source: "vswhere.exe"; Flags: dontcopy noencryption
 #endif
 
 #ifdef UseDirectX

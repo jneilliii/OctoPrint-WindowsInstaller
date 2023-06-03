@@ -82,6 +82,7 @@ Name: "add_firewall_exception"; Description: "Add firewall rule policy exception
 function InitializeSetup: Boolean; 
 begin 
   Dependency_AddVC2013;
+  Dependency_AddVSBuildTools;
   Result := True;          
 end;
 
@@ -398,6 +399,19 @@ begin
   end;
 end;
 
+procedure update_batch_upgrader(); 
+var
+  UnicodeStr: string;
+  ANSIStr: AnsiString;
+begin
+  if LoadStringFromFile(ExpandConstant('{app}\upgrade_octoprint.bat'), ANSIStr) then
+  begin
+    UnicodeStr := String(ANSIStr);
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31050\Scripts\python.bat'), True)
+    SaveStringToFile(ExpandConstant('{app}\upgrade_octoprint.bat'), AnsiString(UnicodeStr), False);
+  end;
+end;
+
 procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin
   { Store the settings so we can restore them next time }
@@ -445,13 +459,16 @@ Source: "WPy64-31050\*"; DestDir: "{app}\WPy64-31050"; Flags: recursesubdirs cre
 Source: "OctoPrint.ico"; DestDir: "{app}"; Flags: uninsneveruninstall; Components: initial_instance
 Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config
+Source: "upgrade_octoprint.bat"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_batch_upgrader
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
 Source: "ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
 Source: "yawcam_install.exe"; DestDir: "{app}"; Components: initial_instance; Tasks: include_yawcam; AfterInstall: update_config_yawcam
 Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_instance; Tasks: include_yawcam
+Source: "vswhere.exe"; Flags: dontcopy noencryption
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
 Name: "{group}\OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "http://localhost:{code:GetOctoPrintPort}/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
 Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; Tasks: install_service
 Name: "{group}\{cm:ProgramOnTheWeb,Installer Help}"; Filename: "{#MyAppSupportURL}"
+Name: "{group}\Upgrade OctoPrint"; Filename: "{app}\upgrade_octoprint.bat"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0

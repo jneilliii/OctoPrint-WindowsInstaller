@@ -467,8 +467,8 @@ Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_ins
 Source: "vs_BuildTools.exe"; DestDir: "{app}"; Components: initial_instance
 
 [Icons]
-Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"
+Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"; Components: initial_instance
 Name: "{group}\OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "http://localhost:{code:GetOctoPrintPort}/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
-Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; Tasks: install_service
-Name: "{group}\{cm:ProgramOnTheWeb,Installer Help}"; Filename: "{#MyAppSupportURL}"
-Name: "{group}\Upgrade OctoPrint"; Filename: "{app}\upgrade_octoprint.bat"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
+Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; Components: initial_instance; Tasks: install_service
+Name: "{group}\{cm:ProgramOnTheWeb,Installer Help}"; Filename: "{#MyAppSupportURL}"; Components: initial_instance
+Name: "{group}\Upgrade OctoPrint"; Filename: "{app}\upgrade_octoprint.bat"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0; Components: initial_instance

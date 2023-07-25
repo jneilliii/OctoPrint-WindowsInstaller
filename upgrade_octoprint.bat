@@ -1,13 +1,15 @@
 @echo off
+cls
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!                                                                           !!!
-@echo !!! In order to proceed with upgrade, please insure OctoPrint service(s) are  !!!
-@echo !!! stopped prior to continuing. You can use the "Shutdown System" option     !!!
-@echo !!! from OctoPrint's system menu or the Services app in Windows.              !!!
+@echo !!! An attempt will be made to stop all OctoPrint services, you may be        !!!
+@echo !!! prompted for admin priviledges for each instance as the process proceeds. !!!
 @echo !!!                                                                           !!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+pause
+FOR %%f IN (OctoPrintService*.exe) DO ((Echo "%%f" | FIND /I "OctoPrintService.exe" 1>NUL) || (%%f stop))
 pause
 cls
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -22,11 +24,13 @@ call "####EXEPATH####" -m pip install --upgrade octoprint
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!                                                                           !!!
 @echo !!! Upgrade process completed, if there are any errors listed above the       !!!
-@echo !!! upgrade probably failed.                                                  !!!
+@echo !!! upgrade probably failed, use the error information to open an issue on    !!!
+@echo !!! GitHub: https://github.com/jneilliii/OctoPrint-WindowsInstaller           !!! 
 @echo !!!                                                                           !!!
-@echo !!! Use the Services app in Windows to start the OctoPrint service(s) or      !!!
-@echo !!! restart to be able to access OctoPrint again.                             !!!
+@echo !!! An attempt will now be made to start all OctoPrint services.              !!!
 @echo !!!                                                                           !!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+pause
+FOR %%f IN (OctoPrintService*.exe) DO ((Echo "%%f" | FIND /I "OctoPrintService.exe" 1>NUL) || (%%f start))
 pause

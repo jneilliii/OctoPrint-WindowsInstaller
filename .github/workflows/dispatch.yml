@@ -16,17 +16,17 @@ jobs:
 
     - id: my_latestrelease
       name: 🔎 Get My Version
-      uses: jneilliii/github-action-get-latest-release@master
+      uses: pozetroninc/github-action-get-latest-release@master
       with:
         repository: ${{ github.repository }}
         token: ${{ secrets.REPODISPATCH_TOKEN }}
 
     - id: octoprint_latestrelease
       name: 🔎 Get OctoPrint Version
-      uses: jneilliii/github-action-get-latest-release@master
+      uses: pozetroninc/github-action-get-latest-release@master
       with:
         repository: OctoPrint/OctoPrint
-        excludes: prerelease, draft
+        excludes: draft
         token: ${{ secrets.REPODISPATCH_TOKEN }}
 
     - name: 💁 Print Versions

@@ -15,10 +15,10 @@ jobs:
     steps:
     - name: 👀 Get OctoPrint Version
       id: octoprint_version
-      uses: jneilliii/github-action-get-latest-release@master
+      uses: pozetroninc/github-action-get-latest-release@master
       with:
         repository: OctoPrint/OctoPrint
-        excludes: prerelease, draft
+        excludes: draft
         token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: 📌 Checkout
@@ -47,7 +47,7 @@ jobs:
       shell: cmd
 
     - name: ✏️ Sign Installer
-      uses: GabrielAcostaEngler/signtool-code-sign@1.0.6
+      uses: Minionguyjpro/signtool-code-sign@1.0.7
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
         cert-password: '${{ secrets.PASSWORD }}'

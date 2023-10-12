@@ -47,7 +47,7 @@ jobs:
       shell: cmd
 
     - name: ✏️ Sign Installer
-      uses: Minionguyjpro/signtool-code-sign@1.0.7
+      uses: jneilliii/signtool-code-sign@main
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
         cert-password: '${{ secrets.PASSWORD }}'
@@ -56,6 +56,7 @@ jobs:
         folder: 'Output'
         recursive: false
         timestamp-server: 'http://timestamp.digicert.com'
+        debug: true
 
     - name: 🧹 Delete Existing Release and Tag
       uses: ClementTsang/delete-tag-and-release@v0.3.1

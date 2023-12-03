@@ -43,21 +43,28 @@ FlatComponentsList=False
 AppendDefaultGroupName=False
 UsePreviousLanguage=no
 UninstallDisplayName=OctoPrint on port {code:GetOctoPrintPort}
+RestartIfNeededByRun=no
 
 [Run]
-Filename: "{app}\vs_BuildTools.exe"; Parameters: "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --quiet --nocache --wait"; WorkingDir: "{app}"; Flags: runascurrentuser; Description: "Install Visual Studio Build Tools"; StatusMsg: "Installing Visual Studio Build Tools, this process can take a considerable amount of time."; Components: initial_instance
+Filename: "{app}\vs_BuildTools.exe"; Parameters: "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --quiet --nocache --wait --norestart"; WorkingDir: "{app}"; Flags: runascurrentuser; Description: "Install Visual Studio Build Tools (required for some plugin installs, ie OctoLapse)"; StatusMsg: "Installing Visual Studio Build Tools, this process can take a considerable amount of time."; Components: initial_instance
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"; Tasks: install_service
-Filename: "http://localhost:{code:GetOctoPrintPort}/"; Flags: runasoriginaluser shellexec postinstall; Description: "Open OctoPrint to complete initial setup."; Tasks: install_service
 Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
 Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser runhidden postinstall; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
 Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""OctoPrint {code:GetOctoPrintPort}"" dir=in protocol=TCP localport={code:GetOctoPrintPort} action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden; Description: "Add Firewall Exception"; StatusMsg: "Adding firewall exception rule"; Components: initial_instance add_instance; Tasks: add_firewall_exception
+Filename: "{app}\go2rtcService.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Install go2rtc Service"; StatusMsg: "Installing g02rtc service"; Tasks: include_go2rtc
+Filename: "{app}\go2rtcService.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Start go2rtc Service"; StatusMsg: "Starting go2rtc service"; Tasks: include_go2rtc
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""go2rtc 1984"" dir=in protocol=TCP localport=1984 action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add go2rtc Firewall Exception"; StatusMsg: "Adding go2rtc firewall exception rule"; Components: initial_instance add_instance; Tasks: include_go2rtc
+Filename: "http://localhost:{code:GetOctoPrintPort}/"; Flags: runasoriginaluser shellexec postinstall; Description: "Open OctoPrint to complete initial setup."; Tasks: install_service
 
 [UninstallRun]
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "StopService"; Tasks: install_service
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "uninstall --no-elevate"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "DelService"; Tasks: install_service
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OctoPrint {code:GetOctoPrintPort}"""; RunOnceId: "FirewallException"; Tasks: add_firewall_exception
+Filename: "{app}\go2rtcService.exe"; Parameters: "stop --no-elevate --no-wait --force"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "Stopgo2rtcService"; Tasks: include_go2rtc
+Filename: "{app}\go2rtcService.exe"; Parameters: "uninstall --no-elevate"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "Delgo2rtcService"; Tasks: include_go2rtc
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""go2rtc 1984"""; RunOnceId: "FirewallException"; Tasks: include_go2rtc
 
 [UninstallDelete]
 ;Type: filesandordirs; Name: "{app}\*"
@@ -75,9 +82,10 @@ UseRelativePaths=True
 
 [Tasks]
 Name: "install_service"; Description: "Install OctoPrint as a Service"
-Name: "include_ffmpeg"; Description: "Include ffmpeg (for timelapse support)"
-Name: "include_yawcam"; Description: "Include YawCam (for webcam support)"; Flags: unchecked; Check: not InstalledOnce
 Name: "add_firewall_exception"; Description: "Add firewall rule policy exception"
+Name: "include_ffmpeg"; Description: "Include ffmpeg (for timelapse support)"
+Name: "include_go2rtc"; Description: "Include go2rtc (modern webcam support)"; Flags: unchecked; Components: initial_instance; Check: not InstalledOnce
+Name: "include_yawcam"; Description: "Include YawCam (for webcam support, requires Java)"; Flags: unchecked; Check: not InstalledOnce
 
 [Code]
 function InitializeSetup: Boolean; 
@@ -90,7 +98,8 @@ var
   InputQueryWizardPage: TInputQueryWizardPage;
   DataDirPage: TInputDirWizardPage;
   ComponentSelectPage: TWizardPage;
-  YawCamSelectIP: TInputOptionWizardPage;
+  YawCamSelectIP: TInputOptionWizardPage;  
+  go2rtcSelectIP: TInputOptionWizardPage;
   WrapperPath: String;
   OctoPrintPort: String;
   OctoPrintBasedir: String;     
@@ -262,6 +271,24 @@ begin
     end;
   end;    
 
+// go2rtc Select IP Page
+
+  go2rtcSelectIP := CreateInputOptionPage(wpSelectTasks,
+  'go2rtc IP Selection', 'What IP should go2rtc be configured for?',
+  'Select the IP address that go2rtc will use and automatically be added to OctoPrint''s config.yaml.',
+  True, False);
+
+  ip_address_list := TStringList.Create;
+  GetIpAddresses(ip_address_list);
+  for counter := 0 to ip_address_list.Count - 1 do
+  begin
+    ip_address := ip_address_list[counter];
+    if not VarIsNull(ip_address) then
+    begin
+      go2rtcSelectIP.Add(ip_address);
+    end;
+  end; 
+
 // Initialize contstants
   OctoPrintPort := InputQueryWizardPage.Values[0];  
   WrapperPath := WizardDirValue() + '\OctoPrintService' + OctoPrintPort + '.exe';
@@ -282,6 +309,11 @@ begin
   end;  
   
   if (PageID = YawCamSelectIP.ID) and not WizardIsTaskSelected('include_yawcam') then
+  begin
+    Result := True;
+  end;  
+
+  if (PageID = go2rtcSelectIP.ID) and not WizardIsTaskSelected('include_go2rtc') then
   begin
     Result := True;
   end;
@@ -359,6 +391,22 @@ begin
   end;
 end;  
 
+procedure update_config_go2rtc();
+var
+  ANSIStr: AnsiString;  
+begin
+  if LoadStringFromFile(OctoPrintBasedir + '\config.yaml', ANSIStr) then
+  begin
+    if Pos('webcam', ANSIStr) = 0 then
+    begin
+      ANSIStr := ANSIStr + #13#10 + 'webcam:';
+    end;
+    ANSIStr := ANSIStr + #13#10 + '  snapshot: http://' + ip_address_list[go2rtcSelectIP.SelectedValueIndex] + ':1984/api/frame.jpeg?src=webcam1';  
+    ANSIStr := ANSIStr + #13#10 + '  stream: http://' + ip_address_list[go2rtcSelectIP.SelectedValueIndex] + ':1984/api/stream.m3u8?src=webcam1';
+    SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
+  end;
+end;  
+
 procedure update_service_yawcam();
 var
   ANSIStr: AnsiString;  
@@ -396,6 +444,33 @@ begin
     StringChangeEx(UnicodeStr, '####BASEDIR####', DataDirPage.Values[0], True) 
     StringChangeEx(UnicodeStr, '####PORT####', InputQueryWizardPage.Values[0], True)
     SaveStringToFile(ExpandConstant('{app}\OctoPrintService' + OctoPrintPort + '.xml'), AnsiString(UnicodeStr), False);
+  end;
+end;
+
+procedure update_go2rtc_config(); 
+var
+  UnicodeStr: string;
+  ANSIStr: AnsiString;
+begin
+  if LoadStringFromFile(ExpandConstant('{app}\go2rtc.yaml'), ANSIStr) then
+  begin
+    UnicodeStr := String(ANSIStr); 
+    StringChangeEx(UnicodeStr, '####APPDIR####', ExpandConstant('{app}'), True)  
+    StringChangeEx(UnicodeStr, '\', '/', True)  
+    SaveStringToFile(ExpandConstant('{app}\go2rtc.yaml'), AnsiString(UnicodeStr), False);
+  end;
+end;
+
+procedure update_go2rtc_service(); 
+var
+  UnicodeStr: string;
+  ANSIStr: AnsiString;
+begin
+  if LoadStringFromFile(ExpandConstant('{app}\go2rtcService.xml'), ANSIStr) then
+  begin
+    UnicodeStr := String(ANSIStr); 
+    StringChangeEx(UnicodeStr, '####APPDIR####', ExpandConstant('{app}'), True)
+    SaveStringToFile(ExpandConstant('{app}\go2rtcService.xml'), AnsiString(UnicodeStr), False);
   end;
 end;
 
@@ -461,10 +536,14 @@ Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance a
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config
 Source: "upgrade_octoprint.bat"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Components: initial_instance; AfterInstall: update_batch_upgrader
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
-Source: "ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Tasks: include_ffmpeg; AfterInstall: update_config_ffmpeg
+Source: "ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Tasks: include_ffmpeg include_go2rtc; AfterInstall: update_config_ffmpeg
 Source: "yawcam_install.exe"; DestDir: "{app}"; Components: initial_instance; Tasks: include_yawcam; AfterInstall: update_config_yawcam
 Source: "yawcam_settings.xml"; DestDir: "{app}\.yawcam"; Components: initial_instance; Tasks: include_yawcam
 Source: "vs_BuildTools.exe"; DestDir: "{app}"; Components: initial_instance
+Source: "go2rtcService.xml"; DestDir: "{app}"; Flags: ignoreversion; Tasks: include_go2rtc; AfterInstall: update_go2rtc_service
+Source: "go2rtc.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: include_go2rtc; AfterInstall: update_config_go2rtc
+Source: "go2rtc.yaml"; DestDir: "{app}"; Flags: ignoreversion; Tasks: include_go2rtc; AfterInstall: update_go2rtc_config
+Source: "go2rtcService.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: include_go2rtc
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}"; Components: initial_instance

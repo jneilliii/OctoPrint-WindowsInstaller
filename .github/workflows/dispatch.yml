@@ -36,7 +36,7 @@ jobs:
 
     - name: 🚀 Repository Dispatch
       if: ${{ format('{0}', steps.octoprint_latestrelease.outputs.release) != steps.my_latestrelease.outputs.release }}
-      uses: peter-evans/repository-dispatch@v2
+      uses: peter-evans/repository-dispatch@v3
       with:
         token: ${{ secrets.REPODISPATCH_TOKEN }}
         repository: jneilliii/OctoPrint-WindowsInstaller

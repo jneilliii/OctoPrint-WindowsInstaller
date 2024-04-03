@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - pillow
   workflow_dispatch:
   repository_dispatch:
     types: [octoprint_release]

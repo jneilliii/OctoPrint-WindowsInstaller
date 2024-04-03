@@ -29,6 +29,11 @@ jobs:
         WPy64-31050\Scripts\python.bat -m pip install OctoPrint==${{ steps.octoprint_version.outputs.release }}
       shell: cmd
 
+    - name: 🔨 Install pillow into WinPython
+      run: |
+        WPy64-31050\Scripts\python.bat -m pip install pillow
+      shell: cmd
+
     - name: 🔨 Build Installer
       run: |
         "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"

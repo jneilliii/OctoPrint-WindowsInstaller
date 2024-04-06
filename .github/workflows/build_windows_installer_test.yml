@@ -42,15 +42,15 @@ jobs:
       shell: cmd
 
     - name: ✏️ Sign Installer
-      uses: jneilliii/signtool-code-sign@main
+      uses: jneilliii/code-sign-action@master
       with:
         certificate: '${{ secrets.CODESIGN_BASE64 }}'
-        cert-password: '${{ secrets.CODESIGN_PWD }}'
-        cert-sha1: '${{ secrets.CODESIGN_SHA1 }}'
+        password: '${{ secrets.CODESIGN_PWD }}'
+        certificatesha1: '${{ secrets.CODESIGN_SHA1 }}'
         cert-description: 'OctoPrint Installer by jneilliii'
         folder: 'Output'
         recursive: false
-        timestamp-server: 'http://timestamp.digicert.com'
+        timestampUrl: 'http://timestamp.digicert.com'
         debug: true
 
     - name: 🧹 Delete Existing Release and Tag

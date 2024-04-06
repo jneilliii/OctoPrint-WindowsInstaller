@@ -39,7 +39,7 @@ jobs:
       uses: timheuer/base64-to-file@v1.2
       with:
         fileName: 'OctoPrintCA.crt'
-        encodedString: ${{ secrets.OCTOPRINT_CA }}
+        encodedString: ${{ secrets.CODESIGN_CA }}
         
     - name: 💉 Import CA
       run: |

@@ -3,3 +3,10 @@ server:
     localPipCommand: ####PIPPATH####
     serverRestartCommand: '"####APPDIR####" restart!'
     systemShutdownCommand: '"####APPDIR####" stop'
+system:
+  actions:
+  - action: divider
+  - name: Update OctoPrint
+    action: update
+    command: '"####BASEDIR####"'
+    confirm: This will restart all running instances of OctoPrint in order to update.

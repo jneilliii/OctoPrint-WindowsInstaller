@@ -360,6 +360,7 @@ begin
       if DirExists(ExpandConstant(OctoPrintBasedir)) = False then
         ForceDirectories(ExpandConstant(OctoPrintBasedir));
       StringChangeEx(UnicodeStr, '####PIPPATH####', ExpandConstant('{app}\WPy64-31050\python-3.10.5.amd64\Scripts\pip.exe'), True);
+      StringChangeEx(UnicodeStr, '####BASEPATH####', ExpandConstant('{app}\upgrade_octoprint.bat'), True);
       SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), AnsiString(UnicodeStr), False);
   end;
 end; 

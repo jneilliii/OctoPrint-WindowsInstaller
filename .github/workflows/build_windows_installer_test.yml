@@ -34,7 +34,7 @@ jobs:
       uses: timheuer/base64-to-file@v1.2
       with:
         fileName: 'OctoPrintCA.crt'
-        encodedString: ${{ secrets.OCTOPRINT_CA }}
+        encodedString: ${{ secrets.CODESIGN_CA }}
         
     - name: 💉 Import CA
       run: |
@@ -44,9 +44,9 @@ jobs:
     - name: ✏️ Sign Installer
       uses: jneilliii/code-sign-action@master
       with:
-        certificate: '${{ secrets.CERTIFICATE }}'
-        password: '${{ secrets.PASSWORD }}'
-        certificatesha1: '${{ secrets.CERTHASH }}'
+        certificate: '${{ secrets.CODESIGN_BASE64 }}'
+        password: '${{ secrets.CODESIGN_PWD }}'
+        certificatesha1: '${{ secrets.CODESIGN_SHA1 }}'
         folder: 'Output'
         recursive: false
         timestampUrl: 'http://timestamp.digicert.com'

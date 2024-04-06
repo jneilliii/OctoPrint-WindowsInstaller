@@ -42,7 +42,7 @@ jobs:
       shell: cmd
 
     - name: ✏️ Sign Installer
-      uses: jneilliii/code-sign-action@main
+      uses: jneilliii/code-sign-action@master
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
         password: '${{ secrets.PASSWORD }}'

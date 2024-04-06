@@ -59,10 +59,8 @@ jobs:
         debug: true
 
     - name: 🧹 Delete Existing Release and Tag
-      uses: ClementTsang/delete-tag-and-release@v0.4.0
-      with:
-        delete_release: true
-        tag_name: ${{ steps.octoprint_version.outputs.release }} # tag name to delete
+      run: gh release delete ${{ steps.octoprint_version.outputs.release }} --cleanup-tag
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

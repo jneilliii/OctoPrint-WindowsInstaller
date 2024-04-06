@@ -19,16 +19,6 @@ jobs:
     - name: 📌 Checkout
       uses: actions/checkout@v4
 
-    - name: 🔨 Install OctoPrint into WinPython
-      run: |
-        WPy64-31050\Scripts\python.bat -m pip install OctoPrint==${{ steps.octoprint_version.outputs.release }}
-      shell: cmd
-
-    - name: 🔨 Build Installer
-      run: |
-        "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
-      shell: cmd
-
     - name: 🔨 Generate CA
       id: write_file
       uses: timheuer/base64-to-file@v1.2
@@ -39,6 +29,16 @@ jobs:
     - name: 💉 Import CA
       run: |
         certutil -addstore "Root" "${{ steps.write_file.outputs.filePath }}"
+      shell: cmd
+
+    - name: 🔨 Install OctoPrint into WinPython
+      run: |
+        WPy64-31050\Scripts\python.bat -m pip install OctoPrint==${{ steps.octoprint_version.outputs.release }}
+      shell: cmd
+
+    - name: 🔨 Build Installer
+      run: |
+        "%programfiles(x86)%\Inno Setup 6\iscc.exe" /DOctoPrintVersion="${{ steps.octoprint_version.outputs.release }}" "OctoPrint Setup.iss"
       shell: cmd
 
     - name: ✏️ Sign Installer

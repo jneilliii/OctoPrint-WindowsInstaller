@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: 👀 Get OctoPrint Version
       id: octoprint_version
-      uses: pozetroninc/github-action-get-latest-release@master
+      uses: jneilliii/github-action-get-latest-release@master
       with:
         repository: OctoPrint/OctoPrint
         excludes: draft
@@ -69,5 +69,6 @@ jobs:
         body: "OctoPrint Setup created with Inno Setup using WinPython, winsw, and GitHub Actions."
         fail_on_unmatched_files: true
         token: ${{ secrets.GITHUB_TOKEN }}
+        prerelease: ${{ steps.octoprint_version.outputs.prerelease }}
         files: |
           Output/OctoPrint Setup ${{ steps.octoprint_version.outputs.release }}.exe

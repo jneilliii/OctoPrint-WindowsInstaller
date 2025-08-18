@@ -19,7 +19,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: 📌 Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: 🔨 Install OctoPrint into WinPython
       run: |

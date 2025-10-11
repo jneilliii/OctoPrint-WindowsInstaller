@@ -359,7 +359,7 @@ begin
     if StringChangeEx(UnicodeStr, '####APPDIR####', WrapperPath, True) > 0 then
       if DirExists(ExpandConstant(OctoPrintBasedir)) = False then
         ForceDirectories(ExpandConstant(OctoPrintBasedir));
-      StringChangeEx(UnicodeStr, '####PIPPATH####', ExpandConstant('{app}\WPy64-31050\python-3.10.5.amd64\Scripts\pip.exe'), True);
+      StringChangeEx(UnicodeStr, '####PIPPATH####', ExpandConstant('{app}\WPy64-31700\python\Scripts\pip.exe'), True);
       SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), AnsiString(UnicodeStr), False);
   end;
 end; 
@@ -440,7 +440,7 @@ begin
   if LoadStringFromFile(ExpandConstant('{app}\OctoPrintService.xml'), ANSIStr) then
   begin
     UnicodeStr := String(ANSIStr);
-    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31050\Scripts\python.bat'), True) 
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\python\Scripts\python.bat'), True) 
     StringChangeEx(UnicodeStr, '####BASEDIR####', DataDirPage.Values[0], True) 
     StringChangeEx(UnicodeStr, '####PORT####', InputQueryWizardPage.Values[0], True)
     SaveStringToFile(ExpandConstant('{app}\OctoPrintService' + OctoPrintPort + '.xml'), AnsiString(UnicodeStr), False);
@@ -482,7 +482,7 @@ begin
   if LoadStringFromFile(ExpandConstant('{app}\upgrade_octoprint.bat'), ANSIStr) then
   begin
     UnicodeStr := String(ANSIStr);
-    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31050\Scripts\python.bat'), True)
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\Scripts\python.bat'), True)
     SaveStringToFile(ExpandConstant('{app}\upgrade_octoprint.bat'), AnsiString(UnicodeStr), False);
   end;
 end;
@@ -530,7 +530,7 @@ end;
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "WPy64-31050\*"; DestDir: "{app}\WPy64-31050"; Flags: recursesubdirs createallsubdirs ignoreversion onlyifdoesntexist uninsneveruninstall; Components: initial_instance
+Source: "WPy64-31700\*"; DestDir: "{app}\WPy64-31700"; Flags: recursesubdirs createallsubdirs ignoreversion onlyifdoesntexist uninsneveruninstall; Components: initial_instance
 Source: "OctoPrint.ico"; DestDir: "{app}"; Flags: uninsneveruninstall; Components: initial_instance
 Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config

@@ -440,7 +440,7 @@ begin
   if LoadStringFromFile(ExpandConstant('{app}\OctoPrintService.xml'), ANSIStr) then
   begin
     UnicodeStr := String(ANSIStr);
-    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\python\Scripts\python.bat'), True) 
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\scripts\python.bat'), True) 
     StringChangeEx(UnicodeStr, '####BASEDIR####', DataDirPage.Values[0], True) 
     StringChangeEx(UnicodeStr, '####PORT####', InputQueryWizardPage.Values[0], True)
     SaveStringToFile(ExpandConstant('{app}\OctoPrintService' + OctoPrintPort + '.xml'), AnsiString(UnicodeStr), False);
@@ -482,7 +482,7 @@ begin
   if LoadStringFromFile(ExpandConstant('{app}\upgrade_octoprint.bat'), ANSIStr) then
   begin
     UnicodeStr := String(ANSIStr);
-    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\Scripts\python.bat'), True)
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\scripts\python.bat'), True)
     SaveStringToFile(ExpandConstant('{app}\upgrade_octoprint.bat'), AnsiString(UnicodeStr), False);
   end;
 end;

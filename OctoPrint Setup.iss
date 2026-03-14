@@ -526,6 +526,27 @@ begin
   Result := DirName;
 end;
 
+procedure SetElevationBit(Filename: string);
+var
+  Buffer: string;
+  Stream: TStream;
+begin
+  Filename := ExpandConstant(Filename);
+  Log('Setting elevation bit for ' + Filename);
+
+  Stream := TFileStream.Create(FileName, fmOpenReadWrite);
+  try
+    Stream.Seek(21, soFromBeginning);
+    SetLength(Buffer, 1);
+    Stream.ReadBuffer(Buffer, 1);
+    Buffer[1] := Chr(Ord(Buffer[1]) or $20);
+    Stream.Seek(-1, soFromCurrent);
+    Stream.WriteBuffer(Buffer, 1);
+  finally
+    Stream.Free;
+  end;
+end;
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -550,4 +571,4 @@ Name: "{group}\{cm:ProgramOnTheWeb,OctoPrint Website}"; Filename: "{#MyAppURL}";
 Name: "{group}\OctoPrint on Port {code:GetOctoPrintPort}"; Filename: "http://localhost:{code:GetOctoPrintPort}/"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0
 Name: "{group}\OctoPrint Service Control"; Filename: "{app}\Service Control"; WorkingDir: "{app}\Service Control"; Components: initial_instance; Tasks: install_service
 Name: "{group}\{cm:ProgramOnTheWeb,Installer Help}"; Filename: "{#MyAppSupportURL}"; Components: initial_instance
-Name: "{group}\Upgrade OctoPrint"; Filename: "{app}\upgrade_octoprint.bat"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0; Components: initial_instance
+Name: "{group}\Upgrade OctoPrint"; Filename: "{app}\upgrade_octoprint.bat"; WorkingDir: "{app}"; IconFilename: "{app}\OctoPrint.ico"; IconIndex: 0; Components: initial_instance; AfterInstall: SetElevationBit('{group}\Upgrade OctoPrint.lnk')

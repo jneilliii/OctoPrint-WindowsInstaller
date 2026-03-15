@@ -48,7 +48,6 @@ RestartIfNeededByRun=no
 [Run]
 Filename: "{app}\vs_BuildTools.exe"; Parameters: "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.22621 --quiet --nocache --wait --norestart"; WorkingDir: "{app}"; Flags: runascurrentuser; Description: "Install Visual Studio Build Tools (required for some plugin installs, ie OctoLapse)"; StatusMsg: "Installing Visual Studio Build Tools, this process can take a considerable amount of time."; Components: initial_instance
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service
-Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"; Tasks: install_service
 Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
 Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser runhidden postinstall; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
 Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
@@ -56,6 +55,8 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""O
 Filename: "{app}\go2rtcService.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Install go2rtc Service"; StatusMsg: "Installing g02rtc service"; Tasks: include_go2rtc
 Filename: "{app}\go2rtcService.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Start go2rtc Service"; StatusMsg: "Starting go2rtc service"; Tasks: include_go2rtc
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""go2rtc 1984"" dir=in protocol=TCP localport=1984 action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add go2rtc Firewall Exception"; StatusMsg: "Adding go2rtc firewall exception rule"; Components: initial_instance add_instance; Tasks: include_go2rtc
+Filename: "{app}\WPy64-31700\scripts\python.bat"; Parameters: "-m pip install https://github.com/jneilliii/OctoPrint-go2rtc/archive/master.zip"; WorkingDir: "{app}"; Flags: runascurrentuser runhidden postinstall; Description: "Install go2rtc plugin in OctoPrint"; StatusMsg: "Adding go2rtc plugin in OctoPrint"; Components: initial_instance add_instance; Tasks: include_go2rtc
+Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"; Tasks: install_service
 Filename: "http://localhost:{code:GetOctoPrintPort}/"; Flags: runasoriginaluser shellexec postinstall; Description: "Open OctoPrint to complete initial setup."; Tasks: install_service
 
 [UninstallRun]
@@ -72,6 +73,7 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=
 [Registry]
 Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: "HKLM"; Subkey: "Software\{#MyAppName}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}"; Flags: preservestringtype
 
 [Components]
 Name: "initial_instance"; Description: "Initial Install"; Flags: exclusive; Check: not InstalledOnce

@@ -476,19 +476,6 @@ begin
   end;
 end;
 
-procedure update_batch_upgrader(); 
-var
-  UnicodeStr: string;
-  ANSIStr: AnsiString;
-begin
-  if LoadStringFromFile(ExpandConstant('{app}\upgrade_octoprint.bat'), ANSIStr) then
-  begin
-    UnicodeStr := String(ANSIStr);
-    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\scripts\python.bat'), True)
-    SaveStringToFile(ExpandConstant('{app}\upgrade_octoprint.bat'), AnsiString(UnicodeStr), False);
-  end;
-end;
-
 procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin
   { Store the settings so we can restore them next time }
@@ -557,7 +544,7 @@ Source: "WPy64-31700\*"; DestDir: "{app}\WPy64-31700"; Flags: recursesubdirs cre
 Source: "OctoPrint.ico"; DestDir: "{app}"; Flags: uninsneveruninstall; Components: initial_instance
 Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config
-Source: "upgrade_octoprint.bat"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Components: initial_instance; AfterInstall: update_batch_upgrader
+Source: "upgrade_octoprint.bat"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Components: initial_instance
 Source: "config.yaml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: rename_config
 Source: "ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall; Tasks: include_ffmpeg include_go2rtc; AfterInstall: update_config_ffmpeg
 Source: "yawcam_install.exe"; DestDir: "{app}"; Components: initial_instance; Tasks: include_yawcam; AfterInstall: update_config_yawcam

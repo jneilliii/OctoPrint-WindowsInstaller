@@ -418,11 +418,13 @@ begin
     if Pos('go2rtc', ANSIStr) = 0 then
     begin
       ANSIStr := ANSIStr + #13#10 + 'plugins:';
+      ANSIStr := ANSIStr + #13#10 + '  _disabled:';
+      ANSIStr := ANSIStr + #13#10 + '  - classicwebcam'; 
       ANSIStr := ANSIStr + #13#10 + '  go2rtc:';
+      ANSIStr := ANSIStr + #13#10 + '    server_url: http://' + ip_address_list[go2rtcSelectIP.SelectedValueIndex] + ':1984';
+      ANSIStr := ANSIStr + #13#10 + '    is_valid_url: true';
+      SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
     end;
-    ANSIStr := ANSIStr + #13#10 + '    server_url: http://' + ip_address_list[go2rtcSelectIP.SelectedValueIndex] + ':1984';
-    ANSIStr := ANSIStr + #13#10 + '    is_valid_url: true';
-    SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
   end;
 end;
 

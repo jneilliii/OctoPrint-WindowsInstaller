@@ -9,7 +9,23 @@ cls
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 pause
-FOR %%f IN (%~dp0\OctoPrintService*.exe) DO ((Echo "%%f" | FIND /I "OctoPrintService.exe" 1>NUL) || (%%f stop))
+cls
+setlocal EnableDelayedExpansion
+FOR /F "usebackq skip=2 tokens=1,2*" %%A IN (`REG QUERY "HKLM\SOFTWARE\WOW6432Node\OctoPrint\Instances" 2^>nul`) DO (
+    REM %%A captures the Value Name
+    REM %%B captures the Value Type (e.g., REG_SZ, REG_DWORD)
+    REM %%C captures the Value Data
+
+    SET "ValueName=%%A"
+    SET "ValueType=%%B"
+    SET "ValueData=%%C"
+    
+    REM Remove quotes from ValueData if present
+    SET "ValueData=!ValueData:\"=!"
+    
+    net stop "OctoPrint on Port !ValueName!"
+)
+endlocal
 pause
 cls
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -32,5 +48,22 @@ call "C:\OctoPrint\WPy64-31700\scripts\python.bat" -m pip install --upgrade octo
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 pause
-FOR %%f IN (%~dp0\OctoPrintService*.exe) DO ((Echo "%%f" | FIND /I "OctoPrintService.exe" 1>NUL) || (%%f start))
+cls
+setlocal EnableDelayedExpansion
+FOR /F "usebackq skip=2 tokens=1,2*" %%A IN (`REG QUERY "HKLM\SOFTWARE\WOW6432Node\OctoPrint\Instances" 2^>nul`) DO (
+    REM %%A captures the Value Name
+    REM %%B captures the Value Type (e.g., REG_SZ, REG_DWORD)
+    REM %%C captures the Value Data
+
+    SET "ValueName=%%A"
+    SET "ValueType=%%B"
+    SET "ValueData=%%C"
+    
+    REM Remove quotes from ValueData if present
+    SET "ValueData=!ValueData:\"=!"
+    
+    net start "OctoPrint on Port !ValueName!"
+)
+endlocal
 pause
+

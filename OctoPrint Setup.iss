@@ -52,10 +52,10 @@ Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir
 Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser runhidden postinstall; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
 Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""OctoPrint {code:GetOctoPrintPort}"" dir=in protocol=TCP localport={code:GetOctoPrintPort} action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add Firewall Exception"; StatusMsg: "Adding firewall exception rule"; Components: initial_instance add_instance; Tasks: add_firewall_exception
+Filename: "{app}\WPy64-31700\scripts\python.bat"; Parameters: "-m pip install ""https://github.com/jneilliii/OctoPrint-go2rtc/archive/master.zip"""; WorkingDir: "{app}"; Flags: runascurrentuser runhidden postinstall; Description: "Install go2rtc plugin in OctoPrint"; StatusMsg: "Adding go2rtc plugin in OctoPrint"; Components: initial_instance; Tasks: include_go2rtc; AfterInstall: update_config_go2rtc_plugin
 Filename: "{app}\go2rtcService.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Install go2rtc Service"; StatusMsg: "Installing g02rtc service"; Tasks: include_go2rtc
 Filename: "{app}\go2rtcService.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Start go2rtc Service"; StatusMsg: "Starting go2rtc service"; Tasks: include_go2rtc
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""go2rtc 1984"" dir=in protocol=TCP localport=1984 action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add go2rtc Firewall Exception"; StatusMsg: "Adding go2rtc firewall exception rule"; Components: initial_instance add_instance; Tasks: include_go2rtc
-Filename: "{app}\WPy64-31700\scripts\python.bat"; Parameters: "-m pip install ""https://github.com/jneilliii/OctoPrint-go2rtc/archive/master.zip"""; WorkingDir: "{app}"; Flags: runascurrentuser runhidden postinstall; Description: "Install go2rtc plugin in OctoPrint (restart OctoPrint after initial setup)"; StatusMsg: "Adding go2rtc plugin in OctoPrint"; Components: initial_instance; Tasks: include_go2rtc
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Start OctoPrint Service"; StatusMsg: "Starting Service on port {code:GetOctoPrintPort}"; Tasks: install_service
 Filename: "http://localhost:{code:GetOctoPrintPort}/"; Flags: runasoriginaluser shellexec postinstall; Description: "Open OctoPrint to complete initial setup."; Tasks: install_service
 
@@ -408,6 +408,23 @@ begin
     SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
   end;
 end;  
+
+procedure update_config_go2rtc_plugin();
+var
+  ANSIStr: AnsiString;  
+begin
+  if LoadStringFromFile(OctoPrintBasedir + '\config.yaml', ANSIStr) then
+  begin
+    if Pos('go2rtc', ANSIStr) = 0 then
+    begin
+      ANSIStr := ANSIStr + #13#10 + 'plugins:';
+      ANSIStr := ANSIStr + #13#10 + '  go2rtc:';
+    end;
+    ANSIStr := ANSIStr + #13#10 + '    server_url: http://' + ip_address_list[go2rtcSelectIP.SelectedValueIndex] + ':1984';
+    ANSIStr := ANSIStr + #13#10 + '    is_valid_url: true';
+    SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), ANSIStr, False);
+  end;
+end;
 
 procedure update_service_yawcam();
 var

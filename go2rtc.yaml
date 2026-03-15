@@ -1,2 +1,4 @@
+api:
+  origin: '*'
 streams:
   webcam1: ffmpeg:device?video=0#video=h264

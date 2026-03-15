@@ -44,6 +44,7 @@ AppendDefaultGroupName=False
 UsePreviousLanguage=no
 UninstallDisplayName=OctoPrint on port {code:GetOctoPrintPort}
 RestartIfNeededByRun=no
+ChangesEnvironment=yes
 
 [Run]
 Filename: "{app}\vs_BuildTools.exe"; Parameters: "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.22621 --quiet --nocache --wait --norestart"; WorkingDir: "{app}"; Flags: runascurrentuser; Description: "Install Visual Studio Build Tools (required for some plugin installs, ie OctoLapse)"; StatusMsg: "Installing Visual Studio Build Tools, this process can take a considerable amount of time."; Components: initial_instance
@@ -73,7 +74,7 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=
 [Registry]
 Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: "HKLM"; Subkey: "Software\{#MyAppName}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}"; Flags: preservestringtype
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}"; Flags: preservestringtype; Check: NeedsAddPath(ExpandConstant('{app}'))
 
 [Components]
 Name: "initial_instance"; Description: "Initial Install"; Flags: exclusive; Check: not InstalledOnce
@@ -526,8 +527,7 @@ var
   DirName: String;
 begin
   DirName:= 'C:\{#MyAppName}';
-  if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\{#MyAppName}\',
-     'InstallPath', DirName) then
+  if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\{#MyAppName}\', 'InstallPath', DirName) then
   begin
     // Successfully read the value
   end;
@@ -553,6 +553,20 @@ begin
   finally
     Stream.Free;
   end;
+end;
+
+function NeedsAddPathHKLM(Param: string): boolean;
+var
+  OrigPath: string;
+begin
+  if not RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', 'Path', OrigPath) then 
+  begin
+    Result := True;
+    exit;
+  end;
+  // look for the path with leading and trailing semicolon
+  // Pos() returns 0 if not found
+  Result := Pos(';' + Param + ';', ';' + OrigPath + ';') = 0;
 end;
 
 [Languages]

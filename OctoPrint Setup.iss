@@ -45,15 +45,19 @@ UsePreviousLanguage=no
 UninstallDisplayName=OctoPrint on port {code:GetOctoPrintPort}
 RestartIfNeededByRun=no
 ChangesEnvironment=yes
+PrivilegesRequired=admin
+ArchitecturesInstallIn64BitMode=x64compatible
 
 [Run]
 Filename: "{app}\vs_BuildTools.exe"; Parameters: "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.22621 --quiet --nocache --wait --norestart"; WorkingDir: "{app}"; Flags: runascurrentuser; Description: "Install Visual Studio Build Tools (required for some plugin installs, ie OctoLapse)"; StatusMsg: "Installing Visual Studio Build Tools, this process can take a considerable amount of time."; Components: initial_instance
+Filename: "{reg:HKLM\SOFTWARE\Python\PythonCore\3.13\InstallPath,|{reg:HKCU\SOFTWARE\Python\PythonCore\3.13\InstallPath,|python}}python.exe"; Parameters: "-m venv {app}\venv"; WorkingDir: "{app}"; Flags: skipifdoesntexist runhidden; Description: "create venv"; StatusMsg: "Creating virtual environment (venv)"; Components: initial_instance
+Filename: "{app}\venv\Scripts\pip.exe"; Parameters: "install --upgrade octoprint"; WorkingDir: "{app}"; Flags: skipifdoesntexist runhidden; Description: "Install OctoPrint"; StatusMsg: "Installing OctoPrint into venv"; Components: initial_instance
 Filename: "{app}\OctoPrintService{code:GetOctoPrintPort}.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Install OctoPrint Service"; StatusMsg: "Installing Service for port {code:GetOctoPrintPort}"; Tasks: install_service
 Filename: "{app}\yawcam_install.exe"; Parameters: "/verysilent /SP-"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser; Description: "Complete YawCAM Install"; StatusMsg: "Complete YawCAM Install"; Components: initial_instance; Tasks: include_yawcam
 Filename: "{commonpf32}\YawCam\Yawcam_Service.exe"; Parameters: "-install"; WorkingDir: "{commonpf32}\YawCam\"; Flags: runascurrentuser runhidden postinstall; Description: "Install YawCam Service"; StatusMsg: "Installing YawCam Service"; Components: initial_instance; Tasks: include_yawcam; BeforeInstall: update_service_yawcam
 Filename: "{sys}\net.exe"; Parameters: "START ""Yawcam"""; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Start YawCam Service"; StatusMsg: "Starting YawCam Service"; Components: initial_instance; Tasks: include_yawcam
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""OctoPrint {code:GetOctoPrintPort}"" dir=in protocol=TCP localport={code:GetOctoPrintPort} action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add Firewall Exception"; StatusMsg: "Adding firewall exception rule"; Components: initial_instance add_instance; Tasks: add_firewall_exception
-Filename: "{app}\WPy64-31700\scripts\python.bat"; Parameters: "-m pip install ""https://github.com/jneilliii/OctoPrint-go2rtc/archive/master.zip"""; WorkingDir: "{app}"; Flags: runascurrentuser runhidden postinstall; Description: "Install go2rtc plugin in OctoPrint"; StatusMsg: "Adding go2rtc plugin in OctoPrint"; Components: initial_instance; Tasks: include_go2rtc; AfterInstall: update_config_go2rtc_plugin
+Filename: "{app}\venv\Scripts\pip.exe"; Parameters: "install ""https://github.com/jneilliii/OctoPrint-go2rtc/archive/master.zip"""; WorkingDir: "{app}"; Flags: runascurrentuser runhidden postinstall skipifdoesntexist; Description: "Install go2rtc plugin in OctoPrint"; StatusMsg: "Adding go2rtc plugin in OctoPrint"; Components: initial_instance; Tasks: include_go2rtc; AfterInstall: update_config_go2rtc_plugin
 Filename: "{app}\go2rtcService.exe"; Parameters: "install"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Install go2rtc Service"; StatusMsg: "Installing g02rtc service"; Tasks: include_go2rtc
 Filename: "{app}\go2rtcService.exe"; Parameters: "start"; WorkingDir: "{app}"; Flags: runhidden runascurrentuser postinstall; Description: "Start go2rtc Service"; StatusMsg: "Starting go2rtc service"; Tasks: include_go2rtc
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""go2rtc 1984"" dir=in protocol=TCP localport=1984 action=allow"; WorkingDir: "{sys}"; Flags: runascurrentuser runhidden postinstall; Description: "Add go2rtc Firewall Exception"; StatusMsg: "Adding go2rtc firewall exception rule"; Components: initial_instance add_instance; Tasks: include_go2rtc
@@ -69,7 +73,7 @@ Filename: "{app}\go2rtcService.exe"; Parameters: "uninstall --no-elevate"; Worki
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""go2rtc 1984"""; RunOnceId: "FirewallException"; Tasks: include_go2rtc
 
 [UninstallDelete]
-;Type: filesandordirs; Name: "{app}\*"
+Type: filesandordirs; Name: "{app}\*"; Components: initial_instance
 
 [Registry]
 Root: "HKLM"; Subkey: "Software\{#MyAppName}\Instances"; ValueType: string; ValueName: "{code:GetOctoPrintPort}"; ValueData: "{code:GetServiceWrapperPath}"; Flags: uninsdeletekeyifempty uninsdeletevalue
@@ -94,6 +98,7 @@ Name: "include_yawcam"; Description: "Include YawCam (for webcam support, requir
 function InitializeSetup: Boolean; 
 begin 
   Dependency_AddVC2013;
+  Dependency_AddPython313;
   Result := True;          
 end;
 
@@ -362,7 +367,7 @@ begin
     if StringChangeEx(UnicodeStr, '####APPDIR####', WrapperPath, True) > 0 then
       if DirExists(ExpandConstant(OctoPrintBasedir)) = False then
         ForceDirectories(ExpandConstant(OctoPrintBasedir));
-      StringChangeEx(UnicodeStr, '####PIPPATH####', ExpandConstant('{app}\WPy64-31700\python\Scripts\pip.exe'), True);
+      //StringChangeEx(UnicodeStr, '####PIPPATH####', ExpandConstant('{app}\venv\Scripts\pip.exe'), True);
       SaveStringToFile(ExpandConstant(OctoPrintBasedir + '\config.yaml'), AnsiString(UnicodeStr), False);
   end;
 end; 
@@ -462,7 +467,7 @@ begin
   if LoadStringFromFile(ExpandConstant('{app}\OctoPrintService.xml'), ANSIStr) then
   begin
     UnicodeStr := String(ANSIStr);
-    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\WPy64-31700\scripts\python.bat'), True) 
+    StringChangeEx(UnicodeStr, '####EXEPATH####', ExpandConstant('{app}\venv\Scripts\python.exe'), True) 
     StringChangeEx(UnicodeStr, '####BASEDIR####', DataDirPage.Values[0], True) 
     StringChangeEx(UnicodeStr, '####PORT####', InputQueryWizardPage.Values[0], True)
     SaveStringToFile(ExpandConstant('{app}\OctoPrintService' + OctoPrintPort + '.xml'), AnsiString(UnicodeStr), False);
@@ -573,7 +578,6 @@ end;
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "WPy64-31700\*"; DestDir: "{app}\WPy64-31700"; Flags: recursesubdirs createallsubdirs ignoreversion onlyifdoesntexist uninsneveruninstall; Components: initial_instance
 Source: "OctoPrint.ico"; DestDir: "{app}"; Flags: uninsneveruninstall; Components: initial_instance
 Source: "OctoPrintService.exe"; DestDir: "{app}"; Components: initial_instance add_instance; AfterInstall: rename_service_wrapper
 Source: "OctoPrintService.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: initial_instance add_instance; AfterInstall: update_service_config

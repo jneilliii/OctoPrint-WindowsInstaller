@@ -1,11 +1,10 @@
 # OctoPrint Windows Installer
 
-This repository uses a GitHub action to make a bundled installer for OctoPrint on Windows. It uses [WinPython](https://github.com/winpython/winpython), [winsw](https://github.com/winsw/winsw), and automates the process of creating a venv, installing OctoPrint in it, and adding an OctoPrint service in Windows.
+This repository uses a GitHub action to make a bundled installer for OctoPrint on Windows. Will automatically download and install Python 3.13 if not found, and automates the process of creating a venv, installing OctoPrint in it, and adding an OctoPrint service (using [winsw](https://github.com/winsw/winsw)) in Windows.
 
 ## System Requirements
 
 The minimum requirements to use the Windows Installer are:
-* 64 bit OS
 * Windows 10 or newer
 
 ## Usage

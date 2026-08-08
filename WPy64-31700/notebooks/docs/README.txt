@@ -1,1 +1,0 @@
-Examples are now to be found at github.com/winpython/winpython_afterdoc

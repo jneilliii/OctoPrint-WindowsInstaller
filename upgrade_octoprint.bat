@@ -11,7 +11,7 @@ cls
 pause
 cls
 setlocal EnableDelayedExpansion
-FOR /F "usebackq skip=2 tokens=1,2*" %%A IN (`REG QUERY "HKLM\SOFTWARE\WOW6432Node\OctoPrint\Instances" 2^>nul`) DO (
+FOR /F "usebackq skip=2 tokens=1,2*" %%A IN (`REG QUERY "HKLM\SOFTWARE\OctoPrint\Instances" 2^>nul`) DO (
     REM %%A captures the Value Name
     REM %%B captures the Value Type (e.g., REG_SZ, REG_DWORD)
     REM %%C captures the Value Data
@@ -35,7 +35,7 @@ cls
 @echo !!!                                                                           !!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-call "%~dp0\WPy64-31700\scripts\python.bat" -m pip install --upgrade octoprint
+call "%~dp0\venv\Scripts\pip.exe" install --upgrade octoprint
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @echo !!!                                                                           !!!
@@ -50,7 +50,7 @@ call "%~dp0\WPy64-31700\scripts\python.bat" -m pip install --upgrade octoprint
 pause
 cls
 setlocal EnableDelayedExpansion
-FOR /F "usebackq skip=2 tokens=1,2*" %%A IN (`REG QUERY "HKLM\SOFTWARE\WOW6432Node\OctoPrint\Instances" 2^>nul`) DO (
+FOR /F "usebackq skip=2 tokens=1,2*" %%A IN (`REG QUERY "HKLM\SOFTWARE\OctoPrint\Instances" 2^>nul`) DO (
     REM %%A captures the Value Name
     REM %%B captures the Value Type (e.g., REG_SZ, REG_DWORD)
     REM %%C captures the Value Data

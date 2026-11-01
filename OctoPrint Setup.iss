@@ -94,6 +94,9 @@ Name: "include_ffmpeg"; Description: "Include ffmpeg (for timelapse support)"
 Name: "include_go2rtc"; Description: "Include go2rtc (modern webcam support)"; Flags: unchecked; Components: initial_instance; Check: not InstalledOnce
 Name: "include_yawcam"; Description: "Include YawCam (for webcam support, requires Java)"; Flags: unchecked; Check: not InstalledOnce
 
+[InstallDelete]
+Type: filesandordirs; Name: "{app}\WPy64-31700"
+
 [Code]
 function InitializeSetup: Boolean; 
 begin 
